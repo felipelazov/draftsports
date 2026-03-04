@@ -4,34 +4,20 @@ import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
 import { CreditCard, QrCode } from 'lucide-react'
 
-const CardPayment = dynamic(
-  () => import('@mercadopago/sdk-react').then((mod) => mod.CardPayment),
+const CardPaymentWrapper = dynamic(
+  () => import('./CardPaymentWrapper'),
   { ssr: false }
 )
-
-interface CardFormData {
-  token: string
-  installments: number
-  payment_method_id: string
-  payer: {
-    email?: string
-    identification?: {
-      type: string
-      number: string
-    }
-  }
-}
 
 interface PaymentFormProps {
   method: 'cartao' | 'pix'
   onMethodChange: (method: 'cartao' | 'pix') => void
   amount: number
-  onCardSubmit: (formData: CardFormData) => Promise<void>
+  onCardSubmit: (formData: Record<string, unknown>) => Promise<void>
   loading?: boolean
-  mpReady?: boolean
 }
 
-export function PaymentForm({ method, onMethodChange, amount, onCardSubmit, loading, mpReady }: PaymentFormProps) {
+export function PaymentForm({ method, onMethodChange, amount, onCardSubmit, loading }: PaymentFormProps) {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-bold text-[#2D3436]">Pagamento</h3>
@@ -89,19 +75,7 @@ export function PaymentForm({ method, onMethodChange, amount, onCardSubmit, load
           exit={{ opacity: 0, height: 0 }}
           className="overflow-hidden"
         >
-          {mpReady ? (
-            <CardPayment
-              initialization={{ amount }}
-              onSubmit={async (formData) => {
-                await onCardSubmit(formData as unknown as CardFormData)
-              }}
-            />
-          ) : (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6C5CE7]" />
-              <span className="ml-3 text-sm text-[#636E72]">Carregando formulario...</span>
-            </div>
-          )}
+          <CardPaymentWrapper amount={amount} onSubmit={onCardSubmit} />
         </motion.div>
       )}
 

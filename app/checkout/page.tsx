@@ -13,7 +13,6 @@ import { JerseyPlaceholder } from '@/components/ui/JerseyPlaceholder'
 import { AddressForm } from '@/components/checkout/AddressForm'
 import { PaymentForm } from '@/components/checkout/PaymentForm'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
-import { initMercadoPago } from '@mercadopago/sdk-react'
 
 interface PixData {
   qrCode: string
@@ -33,17 +32,7 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null)
   const [pixData, setPixData] = useState<PixData | null>(null)
   const [copied, setCopied] = useState(false)
-  const [mpReady, setMpReady] = useState(false)
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  // Inicializar Mercado Pago SDK no client-side
-  useEffect(() => {
-    const publicKey = process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY
-    if (publicKey) {
-      initMercadoPago(publicKey, { locale: 'pt-BR' })
-      setMpReady(true)
-    }
-  }, [])
 
   const subtotal = total()
   const pixDiscount = paymentMethod === 'pix' ? subtotal * 0.05 : 0
@@ -116,7 +105,8 @@ export default function CheckoutPage() {
     }))
 
   // Cartao: chamado pelo CardPayment Brick via onSubmit
-  const handleCardSubmit = async (formData: { token: string; installments: number; payer: { email?: string } }) => {
+  const handleCardSubmit = async (formData: Record<string, unknown>) => {
+    const { token, installments, payer } = formData as { token: string; installments: number; payer: { email?: string } }
     setError(null)
     if (!validateForm()) return
 
@@ -138,9 +128,9 @@ export default function CheckoutPage() {
           paymentMethod: 'cartao',
           shippingAddress: getShippingAddress(),
           total: grandTotal,
-          token: formData.token,
-          installments: formData.installments,
-          payerEmail: formData.payer.email || personalInfo.email,
+          token,
+          installments,
+          payerEmail: payer?.email || personalInfo.email,
         }),
       })
 
@@ -496,7 +486,6 @@ export default function CheckoutPage() {
                 amount={grandTotal}
                 onCardSubmit={handleCardSubmit}
                 loading={loading}
-                mpReady={mpReady}
               />
             </motion.div>
           </div>
