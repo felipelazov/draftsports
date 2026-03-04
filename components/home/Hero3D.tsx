@@ -24,9 +24,9 @@ export function Hero3D({ title, subtitle, ctaText, ctaLink, backgroundImage, car
     const container = containerRef.current
     if (!container) return
 
-    // Create floating particles
+    // Create floating particles (reduced for performance)
     const particles: HTMLDivElement[] = []
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 12; i++) {
       const particle = document.createElement('div')
       const size = Math.random() * 6 + 2
       particle.style.cssText = `
@@ -197,15 +197,19 @@ export function Hero3D({ title, subtitle, ctaText, ctaLink, backgroundImage, car
               <motion.div
                 animate={{
                   y: [0, -15, 0],
-                  rotateY: [0, 5, 0, -5, 0],
+                  rotateY: cardMedia ? undefined : [0, 5, 0, -5, 0],
                 }}
                 transition={{
                   duration: 6,
                   repeat: Infinity,
                   ease: 'easeInOut',
                 }}
-                className="relative w-full h-full bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-3xl border border-white/20 flex items-center justify-center overflow-hidden"
-                style={{ transformStyle: 'preserve-3d', perspective: '1000px' }}
+                className={`relative w-full h-full rounded-3xl border border-white/20 flex items-center justify-center overflow-hidden ${
+                  cardMedia
+                    ? 'bg-black/20'
+                    : 'bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl'
+                }`}
+                style={cardMedia ? undefined : { transformStyle: 'preserve-3d', perspective: '1000px' }}
               >
                 {/* Card content: media or placeholder */}
                 {cardMedia ? (
@@ -216,7 +220,8 @@ export function Hero3D({ title, subtitle, ctaText, ctaLink, backgroundImage, car
                       loop
                       muted
                       playsInline
-                      className="absolute inset-0 z-[1] w-full h-full object-cover object-top rounded-3xl"
+                      preload="metadata"
+                      className="absolute inset-0 z-[1] w-full h-full object-cover object-top rounded-3xl will-change-transform"
                     />
                   ) : (
                     <img
