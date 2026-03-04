@@ -1,0 +1,45 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getProduct, updateProduct, deleteProduct } from '@/lib/supabase-admin'
+
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    const product = await getProduct(id)
+    return NextResponse.json({ product })
+  } catch (error) {
+    console.error('Error fetching product:', error)
+    return NextResponse.json({ error: 'Produto não encontrado' }, { status: 404 })
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    const body = await request.json()
+    const product = await updateProduct(id, body)
+    return NextResponse.json({ product })
+  } catch (error) {
+    console.error('Error updating product:', error)
+    return NextResponse.json({ error: 'Erro ao atualizar produto' }, { status: 500 })
+  }
+}
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    await deleteProduct(id)
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Error deleting product:', error)
+    return NextResponse.json({ error: 'Erro ao deletar produto' }, { status: 500 })
+  }
+}
