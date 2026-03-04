@@ -21,6 +21,8 @@ export function HomeClient({ heroBanner, promoBanner }: HomeClientProps) {
         ctaText={heroBanner?.cta_text}
         ctaLink={heroBanner?.cta_link}
         backgroundImage={heroBanner?.background_image}
+        cardMedia={heroBanner?.card_media}
+        cardMediaType={heroBanner?.card_media_type}
       />
       <CategoryGrid />
       <FeaturedCarousel />

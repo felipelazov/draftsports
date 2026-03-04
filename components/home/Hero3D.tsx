@@ -13,9 +13,11 @@ interface Hero3DProps {
   ctaText?: string
   ctaLink?: string
   backgroundImage?: string | null
+  cardMedia?: string | null
+  cardMediaType?: 'image' | 'video' | null
 }
 
-export function Hero3D({ title, subtitle, ctaText, ctaLink, backgroundImage }: Hero3DProps = {}) {
+export function Hero3D({ title, subtitle, ctaText, ctaLink, backgroundImage, cardMedia, cardMediaType }: Hero3DProps = {}) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -205,16 +207,35 @@ export function Hero3D({ title, subtitle, ctaText, ctaLink, backgroundImage }: H
                 className="relative w-full h-full bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-3xl border border-white/20 flex items-center justify-center overflow-hidden"
                 style={{ transformStyle: 'preserve-3d', perspective: '1000px' }}
               >
-                {/* Jersey silhouette */}
-                <div className="text-center">
-                  <JerseyPlaceholder size="xl" className="w-32 h-32 lg:w-40 lg:h-40 opacity-90" />
-                  <div className="text-white/60 text-sm font-medium tracking-wider uppercase">
-                    Premium Jersey
+                {/* Card content: media or placeholder */}
+                {cardMedia ? (
+                  cardMediaType === 'video' ? (
+                    <video
+                      src={cardMedia}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="absolute inset-0 w-full h-full object-cover rounded-3xl"
+                    />
+                  ) : (
+                    <img
+                      src={cardMedia}
+                      alt="Hero"
+                      className="absolute inset-0 w-full h-full object-cover rounded-3xl"
+                    />
+                  )
+                ) : (
+                  <div className="text-center">
+                    <JerseyPlaceholder size="xl" className="w-32 h-32 lg:w-40 lg:h-40 opacity-90" />
+                    <div className="text-white/60 text-sm font-medium tracking-wider uppercase">
+                      Premium Jersey
+                    </div>
+                    <div className="text-[#A29BFE] text-xs mt-1">
+                      Collection 2026
+                    </div>
                   </div>
-                  <div className="text-[#A29BFE] text-xs mt-1">
-                    Collection 2026
-                  </div>
-                </div>
+                )}
 
                 {/* Floating badges */}
                 <motion.div

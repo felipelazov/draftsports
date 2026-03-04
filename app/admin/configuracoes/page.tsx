@@ -27,6 +27,8 @@ const defaultHero: HeroBanner = {
   cta_text: 'Explorar Catalogo',
   cta_link: '/catalogo',
   background_image: null,
+  card_media: null,
+  card_media_type: null,
 }
 
 const defaultPromo: PromoBanner = {
@@ -249,6 +251,52 @@ export default function ConfiguracoesPage() {
                   placeholder="https://..."
                   className={inputClass}
                 />
+              </div>
+
+              {/* Card Media */}
+              <div className="border-t border-gray-100 pt-4">
+                <h4 className="text-sm font-semibold text-[#2D3436] mb-3">Midia do Card (foto ou video)</h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-[#636E72] mb-1.5">Tipo</label>
+                    <select
+                      value={hero.card_media_type || ''}
+                      onChange={(e) => setHero({
+                        ...hero,
+                        card_media_type: (e.target.value as 'image' | 'video') || null,
+                        card_media: e.target.value ? hero.card_media : null,
+                      })}
+                      className={inputClass}
+                    >
+                      <option value="">Nenhum (placeholder padrao)</option>
+                      <option value="image">Imagem</option>
+                      <option value="video">Video</option>
+                    </select>
+                  </div>
+                  {hero.card_media_type && (
+                    <div>
+                      <label className="block text-xs font-medium text-[#636E72] mb-1.5">
+                        URL da {hero.card_media_type === 'video' ? 'Video' : 'Imagem'}
+                      </label>
+                      <input
+                        type="url"
+                        value={hero.card_media || ''}
+                        onChange={(e) => setHero({ ...hero, card_media: e.target.value || null })}
+                        placeholder="https://..."
+                        className={inputClass}
+                      />
+                    </div>
+                  )}
+                  {hero.card_media && (
+                    <div className="rounded-xl overflow-hidden border border-gray-200 max-w-[200px]">
+                      {hero.card_media_type === 'video' ? (
+                        <video src={hero.card_media} autoPlay loop muted playsInline className="w-full h-40 object-cover" />
+                      ) : (
+                        <img src={hero.card_media} alt="Preview" className="w-full h-40 object-cover" />
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Preview */}

@@ -56,6 +56,8 @@ export interface HeroBanner {
   cta_text: string
   cta_link: string
   background_image: string | null
+  card_media: string | null
+  card_media_type: 'image' | 'video' | null
 }
 
 export interface PromoBanner {
