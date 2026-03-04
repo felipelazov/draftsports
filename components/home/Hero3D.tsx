@@ -216,15 +216,14 @@ export function Hero3D({ title, subtitle, ctaText, ctaLink, backgroundImage, car
                       loop
                       muted
                       playsInline
-                      className="absolute inset-0 w-full h-full object-cover rounded-3xl"
+                      className="absolute inset-0 z-[1] w-full h-full object-cover rounded-3xl"
                     />
                   ) : (
                     <img
                       src={cardMedia}
                       alt="Hero"
-                      className="absolute inset-0 w-full h-full object-cover rounded-3xl"
+                      className="absolute inset-0 z-[1] w-full h-full object-cover rounded-3xl"
                     />
-                  )
                 ) : (
                   <div className="text-center">
                     <JerseyPlaceholder size="xl" className="w-32 h-32 lg:w-40 lg:h-40 opacity-90" />
