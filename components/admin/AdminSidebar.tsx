@@ -1,20 +1,34 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Package, Shield, ShoppingBag, Settings, LogOut } from 'lucide-react'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
 
 const navItems = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/pedidos', label: 'Pedidos', icon: ShoppingBag },
-  { href: '/admin/produtos', label: 'Produtos', icon: Package },
-  { href: '/admin/times', label: 'Times', icon: Shield },
-  { href: '/admin/configuracoes', label: 'Configuracoes', icon: Settings },
+  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, masterOnly: false },
+  { href: '/admin/pedidos', label: 'Pedidos', icon: ShoppingBag, masterOnly: false },
+  { href: '/admin/produtos', label: 'Produtos', icon: Package, masterOnly: false },
+  { href: '/admin/times', label: 'Times', icon: Shield, masterOnly: false },
+  { href: '/admin/configuracoes', label: 'Configuracoes', icon: Settings, masterOnly: true },
 ]
+
+const masterEmails = (process.env.NEXT_PUBLIC_ADMIN_MASTER_EMAILS || '').split(',').map(e => e.trim().toLowerCase())
 
 export function AdminSidebar() {
   const pathname = usePathname()
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+
+  useEffect(() => {
+    const supabase = createSupabaseBrowser()
+    supabase.auth.getUser().then(({ data }) => {
+      setUserEmail(data.user?.email?.toLowerCase() || null)
+    })
+  }, [])
+
+  const isMaster = userEmail ? masterEmails.includes(userEmail) : false
+  const visibleItems = navItems.filter(item => !item.masterOnly || isMaster)
 
   const handleLogout = async () => {
     const supabase = createSupabaseBrowser()
@@ -32,7 +46,7 @@ export function AdminSidebar() {
       </div>
 
       <nav className="flex-1 p-4 space-y-1">
-        {navItems.map(({ href, label, icon: Icon }) => {
+        {visibleItems.map(({ href, label, icon: Icon }) => {
           const isActive = href === '/admin' ? pathname === '/admin' : pathname.startsWith(href)
           return (
             <Link

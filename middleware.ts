@@ -25,12 +25,24 @@ export async function middleware(request: NextRequest) {
     }
 
     const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase())
+    const userEmail = user.email?.toLowerCase() || ''
 
-    if (!adminEmails.includes(user.email?.toLowerCase() || '')) {
+    if (!adminEmails.includes(userEmail)) {
       if (pathname.startsWith('/api/admin')) {
         return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
       }
       return NextResponse.redirect(new URL('/admin/login?error=unauthorized', request.url))
+    }
+
+    // Configuracoes so para admin master
+    if (pathname.startsWith('/admin/configuracoes') || pathname.startsWith('/api/admin/settings')) {
+      const masterEmails = (process.env.ADMIN_MASTER_EMAILS || '').split(',').map(e => e.trim().toLowerCase())
+      if (!masterEmails.includes(userEmail)) {
+        if (pathname.startsWith('/api/admin')) {
+          return NextResponse.json({ error: 'Acesso restrito ao admin master' }, { status: 403 })
+        }
+        return NextResponse.redirect(new URL('/admin?error=master_only', request.url))
+      }
     }
 
     return response

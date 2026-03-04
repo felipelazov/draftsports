@@ -128,25 +128,31 @@ export function Header() {
       {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: -300 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -300 }}
-            transition={{ type: 'spring', damping: 25 }}
-            className="fixed inset-0 z-[var(--z-overlay)] lg:hidden"
-          >
-            <div
-              className="absolute inset-0 bg-black/50"
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[var(--z-overlay)] bg-black/50 lg:hidden"
               onClick={() => setMobileMenuOpen(false)}
             />
-            <div className="relative w-72 h-full bg-white shadow-2xl p-6 pt-24">
+            {/* Panel */}
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25 }}
+              className="fixed top-0 left-0 bottom-0 z-[var(--z-overlay)] w-72 bg-white shadow-2xl p-6 pt-24 lg:hidden"
+            >
               <nav className="flex flex-col gap-2">
                 {leagues.map((league) => (
                   <Link
                     key={league.name}
                     href={league.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="px-4 py-3 text-lg font-medium text-[#2D3436] hover:text-[#6C5CE7] hover:bg-[#6C5CE7]/5 rounded-xl transition-all"
+                    className="px-4 py-3 text-lg font-medium text-[#2D3436] hover:text-[#6C5CE7] hover:bg-[#6C5CE7]/5 rounded-xl transition-colors"
                   >
                     {league.name}
                   </Link>
@@ -174,8 +180,8 @@ export function Header() {
                   Minha Conta
                 </Link>
               </nav>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>
