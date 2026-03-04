@@ -15,8 +15,6 @@ import { PaymentForm } from '@/components/checkout/PaymentForm'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
 import { initMercadoPago } from '@mercadopago/sdk-react'
 
-initMercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY!, { locale: 'pt-BR' })
-
 interface PixData {
   qrCode: string
   qrCodeBase64: string
@@ -35,7 +33,17 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null)
   const [pixData, setPixData] = useState<PixData | null>(null)
   const [copied, setCopied] = useState(false)
+  const [mpReady, setMpReady] = useState(false)
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  // Inicializar Mercado Pago SDK no client-side
+  useEffect(() => {
+    const publicKey = process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY
+    if (publicKey) {
+      initMercadoPago(publicKey, { locale: 'pt-BR' })
+      setMpReady(true)
+    }
+  }, [])
 
   const subtotal = total()
   const pixDiscount = paymentMethod === 'pix' ? subtotal * 0.05 : 0
@@ -488,6 +496,7 @@ export default function CheckoutPage() {
                 amount={grandTotal}
                 onCardSubmit={handleCardSubmit}
                 loading={loading}
+                mpReady={mpReady}
               />
             </motion.div>
           </div>

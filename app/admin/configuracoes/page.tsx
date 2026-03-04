@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Save, Loader2, RotateCcw, Image as ImageIcon } from 'lucide-react'
+import { useEffect, useState, useRef } from 'react'
+import { Save, Loader2, RotateCcw, Image as ImageIcon, Upload, X } from 'lucide-react'
 import type { HeroBanner, PromoBanner, ThemeColors } from '@/types'
 
 const defaultTheme: ThemeColors = {
@@ -88,6 +88,8 @@ export default function ConfiguracoesPage() {
   const [hero, setHero] = useState<HeroBanner>(defaultHero)
   const [promo, setPromo] = useState<PromoBanner>(defaultPromo)
   const [theme, setTheme] = useState<ThemeColors>(defaultTheme)
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     fetch('/api/admin/settings')
@@ -139,6 +141,32 @@ export default function ConfiguracoesPage() {
       setMessage({ type: 'error', text: 'Erro ao salvar tema' })
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleCardMediaUpload = async (file: File) => {
+    setUploading(true)
+    try {
+      const isVideo = file.type.startsWith('video/')
+      const formData = new FormData()
+
+      if (isVideo) {
+        formData.append('file', file)
+        const res = await fetch('/api/admin/upload/video', { method: 'POST', body: formData })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error)
+        setHero({ ...hero, card_media: data.url, card_media_type: 'video' })
+      } else {
+        formData.append('files', file)
+        const res = await fetch('/api/admin/upload', { method: 'POST', body: formData })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error)
+        setHero({ ...hero, card_media: data.urls[0], card_media_type: 'image' })
+      }
+    } catch {
+      setMessage({ type: 'error', text: 'Erro ao fazer upload do arquivo' })
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -257,8 +285,46 @@ export default function ConfiguracoesPage() {
               <div className="border-t border-gray-100 pt-4">
                 <h4 className="text-sm font-semibold text-[#2D3436] mb-3">Midia do Card (foto ou video)</h4>
                 <div className="space-y-3">
+                  {/* Upload area */}
                   <div>
-                    <label className="block text-xs font-medium text-[#636E72] mb-1.5">Tipo</label>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*,video/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) handleCardMediaUpload(file)
+                        e.target.value = ''
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl text-sm text-[#636E72] hover:border-[#6C5CE7] hover:text-[#6C5CE7] transition-colors disabled:opacity-50"
+                    >
+                      {uploading ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          Enviando...
+                        </>
+                      ) : (
+                        <>
+                          <Upload size={16} />
+                          Enviar imagem ou video
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Ou URL manual */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 h-px bg-gray-200" />
+                    <span className="text-xs text-[#636E72]">ou cole uma URL</span>
+                    <div className="flex-1 h-px bg-gray-200" />
+                  </div>
+                  <div className="flex gap-2">
                     <select
                       value={hero.card_media_type || ''}
                       onChange={(e) => setHero({
@@ -266,34 +332,38 @@ export default function ConfiguracoesPage() {
                         card_media_type: (e.target.value as 'image' | 'video') || null,
                         card_media: e.target.value ? hero.card_media : null,
                       })}
-                      className={inputClass}
+                      className="px-3 py-2.5 bg-[#F8F9FE] rounded-xl border border-gray-200 text-sm text-[#2D3436] outline-none focus:border-[#6C5CE7]"
                     >
-                      <option value="">Nenhum (placeholder padrao)</option>
+                      <option value="">Nenhum</option>
                       <option value="image">Imagem</option>
                       <option value="video">Video</option>
                     </select>
-                  </div>
-                  {hero.card_media_type && (
-                    <div>
-                      <label className="block text-xs font-medium text-[#636E72] mb-1.5">
-                        URL da {hero.card_media_type === 'video' ? 'Video' : 'Imagem'}
-                      </label>
+                    {hero.card_media_type && (
                       <input
                         type="url"
                         value={hero.card_media || ''}
                         onChange={(e) => setHero({ ...hero, card_media: e.target.value || null })}
                         placeholder="https://..."
-                        className={inputClass}
+                        className={`flex-1 ${inputClass}`}
                       />
-                    </div>
-                  )}
+                    )}
+                  </div>
+
+                  {/* Preview */}
                   {hero.card_media && (
-                    <div className="rounded-xl overflow-hidden border border-gray-200 max-w-[200px]">
+                    <div className="relative rounded-xl overflow-hidden border border-gray-200 max-w-[200px]">
                       {hero.card_media_type === 'video' ? (
                         <video src={hero.card_media} autoPlay loop muted playsInline className="w-full h-40 object-cover" />
                       ) : (
                         <img src={hero.card_media} alt="Preview" className="w-full h-40 object-cover" />
                       )}
+                      <button
+                        type="button"
+                        onClick={() => setHero({ ...hero, card_media: null, card_media_type: null })}
+                        className="absolute top-2 right-2 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
                     </div>
                   )}
                 </div>

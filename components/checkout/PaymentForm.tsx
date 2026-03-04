@@ -23,9 +23,10 @@ interface PaymentFormProps {
   amount: number
   onCardSubmit: (formData: CardFormData) => Promise<void>
   loading?: boolean
+  mpReady?: boolean
 }
 
-export function PaymentForm({ method, onMethodChange, amount, onCardSubmit, loading }: PaymentFormProps) {
+export function PaymentForm({ method, onMethodChange, amount, onCardSubmit, loading, mpReady }: PaymentFormProps) {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-bold text-[#2D3436]">Pagamento</h3>
@@ -83,13 +84,19 @@ export function PaymentForm({ method, onMethodChange, amount, onCardSubmit, load
           exit={{ opacity: 0, height: 0 }}
           className="overflow-hidden"
         >
-          <CardPayment
-            initialization={{ amount }}
-            onSubmit={async (formData) => {
-              await onCardSubmit(formData as CardFormData)
-            }}
-            locale="pt-BR"
-          />
+          {mpReady ? (
+            <CardPayment
+              initialization={{ amount }}
+              onSubmit={async (formData) => {
+                await onCardSubmit(formData as CardFormData)
+              }}
+            />
+          ) : (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6C5CE7]" />
+              <span className="ml-3 text-sm text-[#636E72]">Carregando formulario...</span>
+            </div>
+          )}
         </motion.div>
       )}
 
