@@ -1,8 +1,13 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
 import { CreditCard, QrCode } from 'lucide-react'
-import { CardPayment } from '@mercadopago/sdk-react'
+
+const CardPayment = dynamic(
+  () => import('@mercadopago/sdk-react').then((mod) => mod.CardPayment),
+  { ssr: false }
+)
 
 interface CardFormData {
   token: string
@@ -88,7 +93,7 @@ export function PaymentForm({ method, onMethodChange, amount, onCardSubmit, load
             <CardPayment
               initialization={{ amount }}
               onSubmit={async (formData) => {
-                await onCardSubmit(formData as CardFormData)
+                await onCardSubmit(formData as unknown as CardFormData)
               }}
             />
           ) : (
