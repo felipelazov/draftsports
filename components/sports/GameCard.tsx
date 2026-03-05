@@ -1,7 +1,73 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Tv, Clock } from 'lucide-react'
+import { Tv, Clock, ExternalLink } from 'lucide-react'
+
+const CHANNEL_URLS: Record<string, string> = {
+  // Streaming
+  'Prime Video': 'https://www.primevideo.com',
+  'Amazon Prime Video': 'https://www.primevideo.com',
+  'Peacock': 'https://www.peacocktv.com',
+  'Paramount+': 'https://www.paramountplus.com',
+  'Apple TV+': 'https://tv.apple.com',
+  'Apple TV': 'https://tv.apple.com',
+  // ESPN
+  'ESPN': 'https://www.espn.com/watch',
+  'ESPN+': 'https://plus.espn.com',
+  'ESPN2': 'https://www.espn.com/watch',
+  'ESPNU': 'https://www.espn.com/watch',
+  'ESPNews': 'https://www.espn.com/watch',
+  'ESPN Deportes': 'https://www.espn.com/watch',
+  'ESPN BET': 'https://www.espn.com/watch',
+  'ABC': 'https://www.espn.com/watch',
+  // NBA
+  'NBA League Pass': 'https://www.nba.com/watch',
+  'NBA TV': 'https://www.nba.com/watch',
+  // NFL
+  'NFL Network': 'https://www.nfl.com/network',
+  'NFL+': 'https://www.nfl.com/plus',
+  'Sunday Ticket': 'https://tv.youtube.com/learn/nflsundayticket',
+  // MLB
+  'MLB.TV': 'https://www.mlb.com/tv',
+  // NHL
+  'NHL Network': 'https://www.nhl.com/info/network',
+  // Fox
+  'FOX': 'https://www.foxsports.com/live',
+  'FS1': 'https://www.foxsports.com/live',
+  'FS2': 'https://www.foxsports.com/live',
+  'Fox Sports': 'https://www.foxsports.com/live',
+  // NBC
+  'NBC': 'https://www.nbcsports.com/live',
+  'NBC Sports': 'https://www.nbcsports.com/live',
+  'NBCSN': 'https://www.nbcsports.com/live',
+  'USA Network': 'https://www.usanetwork.com/live',
+  // Turner
+  'TNT': 'https://www.tntdrama.com/watchtnt',
+  'TBS': 'https://www.tbs.com/watchtbs',
+  'truTV': 'https://www.trutv.com/watchtrutv',
+  // CBS
+  'CBS': 'https://www.cbssports.com/live',
+  'CBS Sports Network': 'https://www.cbssports.com/live',
+  // Soccer
+  'TUDN': 'https://www.tudn.com',
+  'Univision': 'https://www.univision.com',
+  'Fox Soccer Plus': 'https://www.foxsports.com/live',
+  // YouTube
+  'YouTube TV': 'https://tv.youtube.com',
+  'YouTube': 'https://www.youtube.com',
+}
+
+function getChannelUrl(name: string): string | null {
+  if (CHANNEL_URLS[name]) return CHANNEL_URLS[name]
+  // Partial match for regional networks
+  const lower = name.toLowerCase()
+  if (lower.includes('espn')) return 'https://www.espn.com/watch'
+  if (lower.includes('nba') && lower.includes('pass')) return 'https://www.nba.com/watch'
+  if (lower.includes('fox')) return 'https://www.foxsports.com/live'
+  if (lower.includes('nbc')) return 'https://www.nbcsports.com/live'
+  if (lower.includes('prime')) return 'https://www.primevideo.com'
+  return null
+}
 
 export interface GameTeam {
   name: string
@@ -153,11 +219,35 @@ export function GameCard({ game }: { game: Game }) {
 
       {/* Broadcasts */}
       {game.broadcasts && game.broadcasts.length > 0 && (
-        <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
-          <Tv size={12} className="text-[var(--text-muted)] shrink-0" />
-          <p className="text-[11px] text-[var(--text-muted)] truncate">
-            {game.broadcasts.join(' · ')}
-          </p>
+        <div className="flex items-start gap-1.5 mt-3 pt-3 border-t border-gray-50">
+          <Tv size={12} className="text-[var(--text-muted)] shrink-0 mt-0.5" />
+          <div className="flex flex-wrap gap-x-1.5 gap-y-1">
+            {game.broadcasts.map((channel, i) => {
+              const url = getChannelUrl(channel)
+              return (
+                <span key={channel} className="inline-flex items-center">
+                  {url ? (
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-0.5 text-[11px] font-medium text-[#6C5CE7] hover:underline"
+                    >
+                      {channel}
+                      <ExternalLink size={9} />
+                    </a>
+                  ) : (
+                    <span className="text-[11px] text-[var(--text-muted)]">
+                      {channel}
+                    </span>
+                  )}
+                  {i < game.broadcasts.length - 1 && (
+                    <span className="text-[11px] text-[var(--text-muted)] ml-1.5">·</span>
+                  )}
+                </span>
+              )
+            })}
+          </div>
         </div>
       )}
     </motion.div>
