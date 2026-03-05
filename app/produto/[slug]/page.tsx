@@ -13,6 +13,7 @@ import { ProductViewer3D } from '@/components/product/ProductViewer3D'
 import { SizeSelector } from '@/components/product/SizeSelector'
 import { ReviewSection } from '@/components/product/ReviewSection'
 import { RelatedProducts } from '@/components/product/RelatedProducts'
+import { VirtualTryOn } from '@/components/product/VirtualTryOn'
 import { useCart } from '@/hooks/useCart'
 import { useFavorites } from '@/hooks/useFavorites'
 
@@ -190,6 +191,9 @@ export default function ProductPage() {
               selected={selectedSize}
               onSelect={setSelectedSize}
             />
+
+            {/* Virtual Try-On */}
+            <VirtualTryOn product={product} />
 
             {product.stock === 0 ? (
               /* Out of Stock - Notify */
