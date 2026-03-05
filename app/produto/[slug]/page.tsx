@@ -9,7 +9,7 @@ import { formatPrice, calculateDiscount } from '@/lib/utils'
 import { Badge } from '@/components/ui/Badge'
 import { PriceTag } from '@/components/ui/PriceTag'
 import { Button } from '@/components/ui/Button'
-import { ProductViewer3D } from '@/components/product/ProductViewer3D'
+import { ProductGallery } from '@/components/product/ProductGallery'
 import { SizeSelector } from '@/components/product/SizeSelector'
 import { ReviewSection } from '@/components/product/ReviewSection'
 import { RelatedProducts } from '@/components/product/RelatedProducts'
@@ -105,13 +105,14 @@ export default function ProductPage() {
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Left: 3D Viewer */}
+          {/* Left: Product Images */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <ProductViewer3D
+            <ProductGallery
+              images={product.images}
               productName={product.name}
               league={product.league}
             />

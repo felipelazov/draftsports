@@ -53,9 +53,15 @@ export async function GET(request: Request) {
       products = products.slice(0, parseInt(limit))
     }
 
-    return NextResponse.json({ products, total: products.length })
+    return NextResponse.json(
+      { products, total: products.length },
+      { headers: { 'Cache-Control': 'no-store, max-age=0' } }
+    )
   } catch (error) {
     console.error('Error fetching products:', error)
-    return NextResponse.json({ products: [], total: 0 })
+    return NextResponse.json(
+      { products: [], total: 0 },
+      { headers: { 'Cache-Control': 'no-store, max-age=0' } }
+    )
   }
 }
