@@ -8,6 +8,7 @@ import { ArrowLeft, ShoppingBag, Check, Lock, User, MapPin, CreditCard, Loader2,
 import { useCart } from '@/hooks/useCart'
 import { formatPrice } from '@/lib/utils'
 import { ShippingAddress } from '@/types'
+import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { JerseyPlaceholder } from '@/components/ui/JerseyPlaceholder'
 import { AddressForm } from '@/components/checkout/AddressForm'
@@ -562,8 +563,14 @@ export default function CheckoutPage() {
                     key={`${item.product.id}-${item.size}`}
                     className="flex gap-3"
                   >
-                    <div className="w-12 h-12 bg-[#F8F9FE] rounded-lg flex items-center justify-center flex-shrink-0">
-                      <JerseyPlaceholder size="sm" />
+                    <div className="w-12 h-12 bg-[#F8F9FE] rounded-lg flex-shrink-0 relative overflow-hidden">
+                      {item.product.images && item.product.images.length > 0 ? (
+                        <Image src={item.product.images[0]} alt={item.product.name} fill className="object-contain p-1" sizes="48px" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <JerseyPlaceholder size="sm" />
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-[#2D3436] truncate">

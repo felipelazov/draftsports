@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ChevronLeft, ChevronRight, Heart, ShoppingBag } from 'lucide-react'
 import { formatPrice, calculateDiscount } from '@/lib/utils'
 import { Badge } from '@/components/ui/Badge'
@@ -87,14 +88,19 @@ export function FeaturedCarousel() {
               <div className="group relative bg-white rounded-2xl overflow-hidden hover:shadow-[var(--shadow-glow)] border border-transparent hover:border-[var(--primary-light)]/20 transition-all duration-500">
                 {/* Image area */}
                 <div className="relative h-72 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <motion.div
-                      whileHover={{ scale: 1.1, rotate: 5 }}
-                      transition={{ duration: 0.4 }}
-                    >
+                  {product.images && product.images.length > 0 ? (
+                    <Image
+                      src={product.images[0]}
+                      alt={product.name}
+                      fill
+                      className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+                      sizes="300px"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
                       <JerseyPlaceholder size="xl" league={product.league} />
-                    </motion.div>
-                  </div>
+                    </div>
+                  )}
 
                   {/* Badges */}
                   <div className="absolute top-3 left-3 flex flex-col gap-2">

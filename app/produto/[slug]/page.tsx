@@ -191,10 +191,12 @@ export default function ProductPage() {
               sizes={product.sizes}
               selected={selectedSize}
               onSelect={setSelectedSize}
+              stockPerSize={product.stock_per_size}
             />
 
-            {/* Virtual Try-On */}
+            {/* Virtual Try-On (oculto ate ativar billing Gemini)
             <VirtualTryOn product={product} />
+            */}
 
             {product.stock === 0 ? (
               /* Out of Stock - Notify */
@@ -259,7 +261,10 @@ export default function ProductPage() {
                       </button>
                     </div>
                     <span className="text-sm text-[#636E72]">
-                      {product.stock} em estoque
+                      {selectedSize && product.stock_per_size?.[selectedSize] != null
+                        ? `${product.stock_per_size[selectedSize]} em estoque (${selectedSize})`
+                        : `${product.stock} em estoque`
+                      }
                     </span>
                   </div>
                 </div>
@@ -268,7 +273,7 @@ export default function ProductPage() {
                 <div className="flex gap-3 mt-8">
                   <Button
                     onClick={handleAddToCart}
-                    disabled={!selectedSize}
+                    disabled={!selectedSize || (selectedSize && product.stock_per_size?.[selectedSize] === 0)}
                     size="lg"
                     className="flex-1 flex items-center justify-center gap-2"
                   >

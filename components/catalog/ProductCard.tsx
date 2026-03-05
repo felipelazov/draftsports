@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Heart, ShoppingBag } from 'lucide-react'
 import { Product } from '@/types'
 import { formatPrice, calculateDiscount } from '@/lib/utils'
@@ -53,15 +54,19 @@ export function ProductCard({ product }: ProductCardProps) {
 
       {/* Image */}
       <div className="relative h-56 sm:h-64 lg:h-72 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <motion.div
-            whileHover={{ scale: 1.15, rotate: 5 }}
-            transition={{ duration: 0.4 }}
-            style={{ transform: 'translateZ(30px)' }}
-          >
+        {product.images && product.images.length > 0 ? (
+          <Image
+            src={product.images[0]}
+            alt={product.name}
+            fill
+            className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
             <JerseyPlaceholder size="xl" league={product.league} />
-          </motion.div>
-        </div>
+          </div>
+        )}
 
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-20">

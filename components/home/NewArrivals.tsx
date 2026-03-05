@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Heart, ShoppingBag, ArrowRight } from 'lucide-react'
 import { formatPrice, calculateDiscount } from '@/lib/utils'
 import { Badge } from '@/components/ui/Badge'
@@ -67,11 +68,19 @@ export function NewArrivals() {
             <div className="group relative bg-white rounded-2xl overflow-hidden hover:shadow-[var(--shadow-glow)] border border-transparent hover:border-[var(--primary-light)]/20 transition-all duration-500">
               {/* Image */}
               <div className="relative h-56 sm:h-64 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <motion.div whileHover={{ scale: 1.1 }}>
+                {product.images && product.images.length > 0 ? (
+                  <Image
+                    src={product.images[0]}
+                    alt={product.name}
+                    fill
+                    className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
                     <JerseyPlaceholder size="lg" league={product.league} />
-                  </motion.div>
-                </div>
+                  </div>
+                )}
 
                 {/* Badges */}
                 <div className="absolute top-3 left-3 flex flex-col gap-1.5">

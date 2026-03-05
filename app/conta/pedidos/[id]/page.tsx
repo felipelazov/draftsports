@@ -14,6 +14,7 @@ import {
   ExternalLink,
   MapPin,
 } from 'lucide-react'
+import Image from 'next/image'
 import { formatPrice } from '@/lib/utils'
 import { JerseyPlaceholder } from '@/components/ui/JerseyPlaceholder'
 import type { OrderStatus } from '@/types'
@@ -233,8 +234,14 @@ export default function PedidoDetalhePage() {
           <div className="space-y-3">
             {order.order_items.map((item) => (
               <div key={item.id} className="flex items-center gap-4 py-2">
-                <div className="w-14 h-14 bg-[#F8F9FE] rounded-xl flex items-center justify-center flex-shrink-0">
-                  <JerseyPlaceholder size="sm" />
+                <div className="w-14 h-14 bg-[#F8F9FE] rounded-xl flex-shrink-0 relative overflow-hidden">
+                  {item.products?.images?.[0] ? (
+                    <Image src={item.products.images[0]} alt={item.products.name} fill className="object-contain p-1" sizes="56px" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <JerseyPlaceholder size="sm" />
+                    </div>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-[#2D3436] truncate">

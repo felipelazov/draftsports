@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, Tag } from 'lucide-react'
+import Image from 'next/image'
 import { useCart } from '@/hooks/useCart'
 import { formatPrice } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
@@ -82,8 +83,14 @@ export default function CarrinhoPage() {
                   className="bg-white rounded-2xl p-4 sm:p-6 flex gap-4 sm:gap-6 shadow-sm"
                 >
                   {/* Image */}
-                  <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-gray-100 to-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <JerseyPlaceholder size="md" />
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-gray-100 to-gray-50 rounded-xl flex-shrink-0 relative overflow-hidden">
+                    {item.product.images && item.product.images.length > 0 ? (
+                      <Image src={item.product.images[0]} alt={item.product.name} fill className="object-contain p-2" sizes="128px" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <JerseyPlaceholder size="md" />
+                      </div>
+                    )}
                   </div>
 
                   {/* Info */}

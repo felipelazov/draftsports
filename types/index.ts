@@ -13,6 +13,11 @@ export interface Product {
   sizes: Size[]
   colors: string[]
   stock: number
+  cost: number | null
+  player_number: string | null
+  stock_per_size: StockPerSize
+  primary_color: string | null
+  secondary_color: string | null
   featured: boolean
   video_url: string | null
   rating: number
@@ -24,7 +29,9 @@ export type League = 'NBA' | 'NFL' | 'MLB' | 'NHL' | 'FUTEBOL' | 'RETRO' | 'ACES
 
 export type ProductType = 'titular' | 'reserva' | 'retro' | 'especial'
 
-export type Size = 'S' | 'M' | 'L' | 'XL' | 'XXL'
+export type Size = 'P' | 'M' | 'G' | 'GG' | 'XGG'
+
+export type StockPerSize = Partial<Record<Size, number>>
 
 export type OrderStatus = 'pendente' | 'pago' | 'enviado' | 'entregue'
 

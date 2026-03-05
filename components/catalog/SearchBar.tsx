@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, X } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Product } from '@/types'
 import { formatPrice } from '@/lib/utils'
 import { JerseyPlaceholder } from '@/components/ui/JerseyPlaceholder'
@@ -75,8 +76,12 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
                 href={`/produto/${product.slug}`}
                 className="flex items-center gap-3 px-4 py-3 hover:bg-[#F8F9FE] transition-colors"
               >
-                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                  <JerseyPlaceholder size="sm" />
+                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
+                  {product.images && product.images.length > 0 ? (
+                    <Image src={product.images[0]} alt={product.name} fill className="object-contain p-1" sizes="40px" />
+                  ) : (
+                    <JerseyPlaceholder size="sm" />
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[#2D3436] truncate">

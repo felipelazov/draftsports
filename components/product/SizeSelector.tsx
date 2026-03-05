@@ -1,23 +1,16 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Size } from '@/types'
+import { Size, StockPerSize } from '@/types'
 
 interface SizeSelectorProps {
   sizes: Size[]
   selected: Size | null
   onSelect: (size: Size) => void
+  stockPerSize?: StockPerSize
 }
 
-const sizeLabels: Record<Size, string> = {
-  S: 'P',
-  M: 'M',
-  L: 'G',
-  XL: 'GG',
-  XXL: 'XGG',
-}
-
-export function SizeSelector({ sizes, selected, onSelect }: SizeSelectorProps) {
+export function SizeSelector({ sizes, selected, onSelect, stockPerSize }: SizeSelectorProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
@@ -27,22 +20,27 @@ export function SizeSelector({ sizes, selected, onSelect }: SizeSelectorProps) {
         </button>
       </div>
       <div className="flex gap-2">
-        {sizes.map((size) => (
-          <motion.button
-            key={size}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onSelect(size)}
-            className={`relative w-14 h-14 rounded-xl font-semibold text-sm transition-all ${
-              selected === size
-                ? 'bg-[#6C5CE7] text-white shadow-lg shadow-purple-500/25'
-                : 'bg-[#F8F9FE] text-[#2D3436] hover:border-[#6C5CE7] border-2 border-transparent'
-            }`}
-          >
-            <div>{size}</div>
-            <div className="text-[10px] opacity-60">{sizeLabels[size]}</div>
-          </motion.button>
-        ))}
+        {sizes.map((size) => {
+          const outOfStock = stockPerSize && stockPerSize[size] === 0
+          return (
+            <motion.button
+              key={size}
+              whileHover={outOfStock ? {} : { scale: 1.05 }}
+              whileTap={outOfStock ? {} : { scale: 0.95 }}
+              onClick={() => !outOfStock && onSelect(size)}
+              disabled={outOfStock}
+              className={`relative w-14 h-14 rounded-xl font-semibold text-sm transition-all ${
+                outOfStock
+                  ? 'bg-[#F0F0F0] text-[#B0B0B0] cursor-not-allowed line-through'
+                  : selected === size
+                    ? 'bg-[#6C5CE7] text-white shadow-lg shadow-purple-500/25'
+                    : 'bg-[#F8F9FE] text-[#2D3436] hover:border-[#6C5CE7] border-2 border-transparent'
+              }`}
+            >
+              {size}
+            </motion.button>
+          )
+        })}
       </div>
     </div>
   )

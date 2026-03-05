@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowLeft, Package, Truck, Check, Clock, ShoppingBag } from 'lucide-react'
+import Image from 'next/image'
 import { formatPrice } from '@/lib/utils'
 import { JerseyPlaceholder } from '@/components/ui/JerseyPlaceholder'
 import type { OrderStatus } from '@/types'
@@ -109,8 +110,14 @@ export default function PedidosPage() {
                       <div className="space-y-2 mb-4">
                         {order.order_items.map((item) => (
                           <div key={item.id} className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-[#F8F9FE] rounded-lg flex items-center justify-center flex-shrink-0">
-                              <JerseyPlaceholder size="sm" />
+                            <div className="w-10 h-10 bg-[#F8F9FE] rounded-lg flex-shrink-0 relative overflow-hidden">
+                              {item.products?.images?.[0] ? (
+                                <Image src={item.products.images[0]} alt={item.products.name} fill className="object-contain p-1" sizes="40px" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <JerseyPlaceholder size="sm" />
+                                </div>
+                              )}
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-[#2D3436] truncate">

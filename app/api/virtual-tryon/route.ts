@@ -97,74 +97,76 @@ export async function POST(request: Request) {
     const productImageBase64 = Buffer.from(productImageBuffer).toString('base64')
     const productContentType = productImageRes.headers.get('content-type') || 'image/jpeg'
 
-    // 6. Call Gemini
-    const response = await genai.models.generateContent({
-      model: 'gemini-2.5-flash-preview-05-20',
-      contents: [
-        {
-          role: 'user',
-          parts: [
-            {
-              text: `You are a professional virtual try-on system for a sports jersey store.
+    // 6. Call Gemini (try primary model, fallback to secondary)
+    const IMAGE_MODELS = [
+      'gemini-2.5-flash-image',
+      'gemini-2.0-flash-exp-image-generation',
+    ]
+
+    const prompt = `You are a professional virtual try-on system for a sports jersey store.
 Take the person in the FIRST image and realistically dress them in the jersey/shirt shown in the SECOND image.
 - Keep face, body, pose, skin tone EXACTLY as they are
 - Replace ONLY top clothing with the jersey
 - Maintain realistic wrinkles, shadows, lighting
 - Keep background and lower body unchanged
 - Jersey design, colors, logos must be accurate
-- Output a single photorealistic image`,
-            },
-            {
-              inlineData: {
-                mimeType: mimeType,
-                data: photoBase64,
-              },
-            },
-            {
-              inlineData: {
-                mimeType: productContentType,
-                data: productImageBase64,
-              },
-            },
-          ],
-        },
-      ],
-      config: {
-        responseModalities: ['IMAGE', 'TEXT'],
+- Output a single photorealistic image`
+
+    const contents = [
+      {
+        role: 'user' as const,
+        parts: [
+          { text: prompt },
+          { inlineData: { mimeType: mimeType, data: photoBase64 } },
+          { inlineData: { mimeType: productContentType, data: productImageBase64 } },
+        ],
       },
-    })
-
-    // 7. Extract generated image
-    const candidates = response.candidates
-    if (!candidates || candidates.length === 0) {
-      return NextResponse.json(
-        { error: 'A IA nao conseguiu gerar a imagem. Tente com outra foto.' },
-        { status: 500 }
-      )
-    }
-
-    const parts = candidates[0].content?.parts
-    if (!parts) {
-      return NextResponse.json(
-        { error: 'Resposta inesperada da IA. Tente novamente.' },
-        { status: 500 }
-      )
-    }
+    ]
 
     let generatedImage: { data: string; mimeType: string } | null = null
-    for (const part of parts) {
-      if (part.inlineData) {
-        generatedImage = {
-          data: part.inlineData.data!,
-          mimeType: part.inlineData.mimeType!,
+    let lastError: string | null = null
+
+    for (const modelName of IMAGE_MODELS) {
+      try {
+        const response = await genai.models.generateContent({
+          model: modelName,
+          contents,
+          config: { responseModalities: ['IMAGE', 'TEXT'] },
+        })
+
+        const parts = response.candidates?.[0]?.content?.parts
+        if (parts) {
+          for (const part of parts) {
+            if (part.inlineData) {
+              generatedImage = {
+                data: part.inlineData.data!,
+                mimeType: part.inlineData.mimeType!,
+              }
+              break
+            }
+          }
         }
-        break
+
+        if (generatedImage) break
+      } catch (modelError: unknown) {
+        const errMsg = modelError instanceof Error ? modelError.message : String(modelError)
+        console.error(`Model ${modelName} failed:`, errMsg)
+
+        if (errMsg.includes('429') || errMsg.includes('quota')) {
+          return NextResponse.json(
+            { error: 'Limite de uso da IA atingido. Tente novamente em alguns minutos.' },
+            { status: 429 }
+          )
+        }
+
+        lastError = errMsg
       }
     }
 
     if (!generatedImage) {
+      console.error('All image models failed. Last error:', lastError)
       return NextResponse.json(
-        { error: 'A IA nao gerou uma imagem. Tente com outra foto ou angulo diferente.' },
+        { error: 'A IA nao conseguiu gerar a imagem. Tente com outra foto ou angulo diferente.' },
         { status: 500 }
       )
     }

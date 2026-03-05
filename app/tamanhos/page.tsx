@@ -1,10 +1,10 @@
 export default function TamanhosPage() {
   const sizes = [
-    { size: 'S', chest: '88-92', length: '68', shoulder: '42' },
+    { size: 'P', chest: '88-92', length: '68', shoulder: '42' },
     { size: 'M', chest: '96-100', length: '71', shoulder: '44' },
-    { size: 'L', chest: '104-108', length: '74', shoulder: '47' },
-    { size: 'XL', chest: '112-116', length: '77', shoulder: '50' },
-    { size: 'XXL', chest: '120-124', length: '80', shoulder: '53' },
+    { size: 'G', chest: '104-108', length: '74', shoulder: '47' },
+    { size: 'GG', chest: '112-116', length: '77', shoulder: '50' },
+    { size: 'XGG', chest: '120-124', length: '80', shoulder: '53' },
   ]
 
   return (

@@ -5,7 +5,7 @@ import { Upload, X, Loader2, Video } from 'lucide-react'
 import { slugify } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { RichTextEditor } from '@/components/admin/RichTextEditor'
-import type { Product, League, ProductType, Size, Team } from '@/types'
+import type { Product, League, ProductType, Size, Team, StockPerSize } from '@/types'
 
 interface ProductFormProps {
   product?: Product
@@ -14,7 +14,27 @@ interface ProductFormProps {
 
 const allLeagues: League[] = ['NBA', 'NFL', 'MLB', 'NHL', 'FUTEBOL', 'RETRO']
 const allTypes: ProductType[] = ['titular', 'reserva', 'retro', 'especial']
-const allSizes: Size[] = ['S', 'M', 'L', 'XL', 'XXL']
+const allSizes: Size[] = ['P', 'M', 'G', 'GG', 'XGG']
+
+const colorPresets = [
+  { name: 'Branco', hex: '#FFFFFF' },
+  { name: 'Preto', hex: '#000000' },
+  { name: 'Azul', hex: '#2563EB' },
+  { name: 'Vermelho', hex: '#DC2626' },
+  { name: 'Amarelo', hex: '#EAB308' },
+  { name: 'Verde', hex: '#16A34A' },
+  { name: 'Roxo', hex: '#7C3AED' },
+  { name: 'Laranja', hex: '#EA580C' },
+  { name: 'Rosa', hex: '#EC4899' },
+  { name: 'Cinza', hex: '#6B7280' },
+  { name: 'Dourado', hex: '#CA8A04' },
+  { name: 'Marrom', hex: '#78350F' },
+  { name: 'Vinho', hex: '#881337' },
+  { name: 'Azul Marinho', hex: '#1E3A5F' },
+  { name: 'Aqua', hex: '#06B6D4' },
+  { name: 'Grená', hex: '#A50034' },
+  { name: 'Azul Claro', hex: '#7DD3FC' },
+]
 
 const inputClass = 'w-full px-4 py-3 bg-[var(--bg)] rounded-xl border border-[var(--gray-200)] text-sm text-[var(--text)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10'
 const labelClass = 'block text-xs font-medium text-[var(--text-secondary)] mb-1.5'
@@ -28,6 +48,7 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
   const [description, setDescription] = useState(product?.description || '')
   const [price, setPrice] = useState(product?.price?.toString() || '')
   const [originalPrice, setOriginalPrice] = useState(product?.original_price?.toString() || '')
+  const [cost, setCost] = useState(product?.cost?.toString() || '')
   const [imageUrls, setImageUrls] = useState<string[]>(product?.images || [])
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -37,15 +58,19 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
   const [league, setLeague] = useState<League>(product?.league || 'NBA')
   const [team, setTeam] = useState(product?.team || '')
   const [player, setPlayer] = useState(product?.player || '')
+  const [playerNumber, setPlayerNumber] = useState(product?.player_number || '')
   const [type, setType] = useState<ProductType>(product?.type || 'titular')
-  const [sizes, setSizes] = useState<Size[]>(product?.sizes || ['M', 'L', 'XL'])
-  const [colors, setColors] = useState(product?.colors?.join(', ') || '')
-  const [stock, setStock] = useState(product?.stock?.toString() || '50')
+  const [sizes, setSizes] = useState<Size[]>(product?.sizes || ['M', 'G', 'GG'])
+  const [stockPerSize, setStockPerSize] = useState<StockPerSize>(product?.stock_per_size || {})
+  const [primaryColor, setPrimaryColor] = useState(product?.primary_color || '')
+  const [secondaryColor, setSecondaryColor] = useState(product?.secondary_color || '')
   const [featured, setFeatured] = useState(product?.featured || false)
   const [rating, setRating] = useState(product?.rating?.toString() || '4.5')
   const [reviewCount, setReviewCount] = useState(product?.review_count?.toString() || '0')
   const [teams, setTeams] = useState<Team[]>([])
   const [teamsLoading, setTeamsLoading] = useState(false)
+
+  const totalStock = Object.values(stockPerSize).reduce((sum, v) => sum + (v || 0), 0)
 
   useEffect(() => {
     setTeamsLoading(true)
@@ -67,16 +92,31 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
       .finally(() => setTeamsLoading(false))
   }, [league])
 
+  // Slug auto-gerado a partir de liga+time+jogador+tipo+numero
   useEffect(() => {
-    if (!product) {
-      setSlug(slugify(name))
+    const parts = [league?.toLowerCase(), team, player, type, playerNumber].filter(Boolean)
+    if (parts.length >= 2) {
+      setSlug(slugify(parts.join(' ')))
     }
-  }, [name, product])
+  }, [league, team, player, type, playerNumber])
 
   const toggleSize = (size: Size) => {
-    setSizes(prev =>
-      prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
-    )
+    setSizes(prev => {
+      const newSizes = prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
+      // Remover do stockPerSize se desativou
+      if (prev.includes(size)) {
+        setStockPerSize(sp => {
+          const copy = { ...sp }
+          delete copy[size]
+          return copy
+        })
+      }
+      return newSizes
+    })
+  }
+
+  const updateStockForSize = (size: Size, qty: number) => {
+    setStockPerSize(prev => ({ ...prev, [size]: qty }))
   }
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,10 +196,15 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
         league,
         team,
         player: player || null,
+        player_number: playerNumber || null,
         type,
         sizes,
-        colors: colors ? colors.split(',').map(s => s.trim()).filter(Boolean) : [],
-        stock: parseInt(stock) || 0,
+        colors: [primaryColor, secondaryColor].filter(Boolean),
+        stock: totalStock,
+        cost: cost ? parseFloat(cost) : null,
+        stock_per_size: stockPerSize,
+        primary_color: primaryColor || null,
+        secondary_color: secondaryColor || null,
         featured,
         video_url: videoUrl || null,
         rating: parseFloat(rating) || 0,
@@ -194,13 +239,12 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
           />
         </div>
         <div>
-          <label className={labelClass}>Slug</label>
+          <label className={labelClass}>Slug (auto-gerado)</label>
           <input
             type="text"
             value={slug}
-            onChange={e => setSlug(e.target.value)}
-            placeholder="camisa-lakers-23-lebron"
-            className={inputClass}
+            readOnly
+            className={inputClass + ' bg-[var(--bg-sunken)] cursor-not-allowed'}
           />
         </div>
       </div>
@@ -215,8 +259,8 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
         />
       </div>
 
-      {/* Price + Original Price + Stock */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Price + Original Price + Cost + Stock Total */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
           <label className={labelClass}>Preço (R$) *</label>
           <input
@@ -243,15 +287,24 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
           />
         </div>
         <div>
-          <label className={labelClass}>Estoque *</label>
+          <label className={labelClass}>Custo (R$)</label>
           <input
             type="number"
+            step="0.01"
             min="0"
-            value={stock}
-            onChange={e => setStock(e.target.value)}
-            placeholder="50"
-            required
+            value={cost}
+            onChange={e => setCost(e.target.value)}
+            placeholder="150.00"
             className={inputClass}
+          />
+        </div>
+        <div>
+          <label className={labelClass}>Estoque Total</label>
+          <input
+            type="number"
+            value={totalStock}
+            readOnly
+            className={inputClass + ' bg-[var(--bg-sunken)] cursor-not-allowed'}
           />
         </div>
       </div>
@@ -310,36 +363,117 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
         </div>
       </div>
 
-      {/* Player */}
-      <div>
-        <label className={labelClass}>Jogador</label>
-        <input
-          type="text"
-          value={player}
-          onChange={e => setPlayer(e.target.value)}
-          placeholder="LeBron James"
-          className={inputClass}
-        />
+      {/* Player + Player Number */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className={labelClass}>Jogador</label>
+          <input
+            type="text"
+            value={player}
+            onChange={e => setPlayer(e.target.value)}
+            placeholder="LeBron James"
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label className={labelClass}>Número da Camisa</label>
+          <input
+            type="text"
+            value={playerNumber}
+            onChange={e => setPlayerNumber(e.target.value)}
+            placeholder="23"
+            className={inputClass}
+          />
+        </div>
       </div>
 
-      {/* Sizes */}
+      {/* Sizes + Stock per Size */}
       <div>
-        <label className={labelClass}>Tamanhos *</label>
-        <div className="flex gap-2 mt-1">
-          {allSizes.map(size => (
-            <button
-              key={size}
-              type="button"
-              onClick={() => toggleSize(size)}
-              className={`px-4 py-2 rounded-[var(--radius-md)] text-sm font-medium border transition-colors cursor-pointer ${
-                sizes.includes(size)
-                  ? 'bg-[var(--primary)] text-white border-[var(--primary)]'
-                  : 'bg-[var(--bg)] text-[var(--text-secondary)] border-[var(--gray-200)] hover:border-[var(--primary)]'
-              }`}
-            >
-              {size}
-            </button>
-          ))}
+        <label className={labelClass}>Tamanhos e Estoque *</label>
+        <div className="space-y-3 mt-1">
+          <div className="flex gap-2">
+            {allSizes.map(size => (
+              <button
+                key={size}
+                type="button"
+                onClick={() => toggleSize(size)}
+                className={`px-4 py-2 rounded-[var(--radius-md)] text-sm font-medium border transition-colors cursor-pointer ${
+                  sizes.includes(size)
+                    ? 'bg-[var(--primary)] text-white border-[var(--primary)]'
+                    : 'bg-[var(--bg)] text-[var(--text-secondary)] border-[var(--gray-200)] hover:border-[var(--primary)]'
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+          {sizes.length > 0 && (
+            <div className="flex flex-wrap gap-3">
+              {allSizes.filter(s => sizes.includes(s)).map(size => (
+                <div key={size} className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-[var(--text-secondary)] w-8">{size}</span>
+                  <input
+                    type="number"
+                    min="0"
+                    value={stockPerSize[size] ?? 0}
+                    onChange={e => updateStockForSize(size, parseInt(e.target.value) || 0)}
+                    className="w-20 px-3 py-2 bg-[var(--bg)] rounded-lg border border-[var(--gray-200)] text-sm text-[var(--text)] outline-none focus:border-[var(--primary)] text-center"
+                  />
+                </div>
+              ))}
+              <div className="flex items-center gap-2 ml-2 pl-3 border-l border-[var(--gray-200)]">
+                <span className="text-xs font-semibold text-[var(--text)]">Total: {totalStock}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Color Selectors */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className={labelClass}>Cor Principal</label>
+          <div className="flex flex-wrap gap-2 mt-1">
+            {colorPresets.map(c => (
+              <button
+                key={c.name}
+                type="button"
+                title={c.name}
+                onClick={() => setPrimaryColor(primaryColor === c.name ? '' : c.name)}
+                className={`w-8 h-8 rounded-full border-2 transition-all cursor-pointer ${
+                  primaryColor === c.name
+                    ? 'border-[var(--primary)] scale-110 shadow-md'
+                    : 'border-[var(--gray-200)] hover:scale-105'
+                }`}
+                style={{ backgroundColor: c.hex }}
+              />
+            ))}
+          </div>
+          {primaryColor && (
+            <p className="text-xs text-[var(--text-muted)] mt-1">{primaryColor}</p>
+          )}
+        </div>
+        <div>
+          <label className={labelClass}>Cor Secundária</label>
+          <div className="flex flex-wrap gap-2 mt-1">
+            {colorPresets.map(c => (
+              <button
+                key={c.name}
+                type="button"
+                title={c.name}
+                onClick={() => setSecondaryColor(secondaryColor === c.name ? '' : c.name)}
+                className={`w-8 h-8 rounded-full border-2 transition-all cursor-pointer ${
+                  secondaryColor === c.name
+                    ? 'border-[var(--primary)] scale-110 shadow-md'
+                    : 'border-[var(--gray-200)] hover:scale-105'
+                }`}
+                style={{ backgroundColor: c.hex }}
+              />
+            ))}
+          </div>
+          {secondaryColor && (
+            <p className="text-xs text-[var(--text-muted)] mt-1">{secondaryColor}</p>
+          )}
         </div>
       </div>
 
@@ -460,18 +594,6 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
             </>
           )}
         </div>
-      </div>
-
-      {/* Colors */}
-      <div>
-        <label className={labelClass}>Cores (separadas por vírgula)</label>
-        <input
-          type="text"
-          value={colors}
-          onChange={e => setColors(e.target.value)}
-          placeholder="Amarelo, Roxo"
-          className={inputClass}
-        />
       </div>
 
       {/* Rating + Review Count */}
