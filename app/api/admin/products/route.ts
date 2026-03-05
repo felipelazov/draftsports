@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { getProducts, createProduct } from '@/lib/supabase-admin'
 
 export async function GET() {
@@ -15,6 +16,13 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const product = await createProduct(body)
+    revalidatePath('/')
+    revalidatePath('/catalogo')
+    revalidatePath('/nba')
+    revalidatePath('/nfl')
+    revalidatePath('/mlb')
+    revalidatePath('/nhl')
+    revalidatePath('/futebol')
     return NextResponse.json({ product }, { status: 201 })
   } catch (error) {
     console.error('Error creating product:', error)

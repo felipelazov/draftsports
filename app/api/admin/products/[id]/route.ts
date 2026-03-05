@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { getProduct, updateProduct, deleteProduct } from '@/lib/supabase-admin'
 
 export async function GET(
@@ -23,6 +24,14 @@ export async function PUT(
     const { id } = await params
     const body = await request.json()
     const product = await updateProduct(id, body)
+    revalidatePath('/')
+    revalidatePath('/catalogo')
+    revalidatePath('/nba')
+    revalidatePath('/nfl')
+    revalidatePath('/mlb')
+    revalidatePath('/nhl')
+    revalidatePath('/futebol')
+    revalidatePath(`/produto/${product.slug}`)
     return NextResponse.json({ product })
   } catch (error) {
     console.error('Error updating product:', error)
@@ -37,6 +46,13 @@ export async function DELETE(
   try {
     const { id } = await params
     await deleteProduct(id)
+    revalidatePath('/')
+    revalidatePath('/catalogo')
+    revalidatePath('/nba')
+    revalidatePath('/nfl')
+    revalidatePath('/mlb')
+    revalidatePath('/nhl')
+    revalidatePath('/futebol')
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting product:', error)
