@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { Tv, Clock } from 'lucide-react'
 
 export interface GameTeam {
   name: string
@@ -16,6 +17,9 @@ export interface Game {
   name: string
   status: 'scheduled' | 'live' | 'final'
   statusDetail: string
+  timeBRT: string
+  weekday: string
+  broadcasts: string[]
   homeTeam: GameTeam
   awayTeam: GameTeam
 }
@@ -41,11 +45,7 @@ function StatusBadge({ status, detail }: { status: Game['status']; detail: strin
     )
   }
 
-  return (
-    <span className="text-xs font-medium text-[var(--text-secondary)]">
-      {detail}
-    </span>
-  )
+  return null
 }
 
 function TeamRow({
@@ -113,10 +113,30 @@ export function GameCard({ game }: { game: Game }) {
           : 'border-gray-100'
       }`}
     >
-      <div className="mb-3">
-        <StatusBadge status={game.status} detail={game.statusDetail} />
+      {/* Header: time + status + day */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          {game.status === 'scheduled' ? (
+            <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[var(--text)]">
+              <Clock size={14} className="text-[var(--text-muted)]" />
+              {game.timeBRT}
+            </span>
+          ) : (
+            <StatusBadge status={game.status} detail={game.statusDetail} />
+          )}
+          <span className="text-[11px] text-[var(--text-muted)] capitalize">
+            {game.weekday}
+          </span>
+        </div>
+
+        {game.status !== 'scheduled' && game.timeBRT && (
+          <span className="text-[11px] text-[var(--text-muted)]">
+            {game.timeBRT}
+          </span>
+        )}
       </div>
 
+      {/* Teams */}
       <div className="space-y-0.5">
         <TeamRow
           team={game.awayTeam}
@@ -130,6 +150,16 @@ export function GameCard({ game }: { game: Game }) {
           showScore={showScore}
         />
       </div>
+
+      {/* Broadcasts */}
+      {game.broadcasts && game.broadcasts.length > 0 && (
+        <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
+          <Tv size={12} className="text-[var(--text-muted)] shrink-0" />
+          <p className="text-[11px] text-[var(--text-muted)] truncate">
+            {game.broadcasts.join(' · ')}
+          </p>
+        </div>
+      )}
     </motion.div>
   )
 }
@@ -137,7 +167,10 @@ export function GameCard({ game }: { game: Game }) {
 export function GameCardSkeleton() {
   return (
     <div className="bg-[var(--card)] rounded-[var(--radius-lg)] p-4 shadow-sm border border-gray-100">
-      <div className="h-4 w-20 rounded bg-gray-100 animate-shimmer mb-3" />
+      <div className="flex items-center gap-2 mb-3">
+        <div className="h-4 w-12 rounded bg-gray-100 animate-shimmer" />
+        <div className="h-3 w-20 rounded bg-gray-100 animate-shimmer" />
+      </div>
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -154,6 +187,10 @@ export function GameCardSkeleton() {
           </div>
           <div className="h-5 w-8 rounded bg-gray-100 animate-shimmer" />
         </div>
+      </div>
+      <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
+        <div className="h-3 w-3 rounded bg-gray-100 animate-shimmer" />
+        <div className="h-3 w-40 rounded bg-gray-100 animate-shimmer" />
       </div>
     </div>
   )

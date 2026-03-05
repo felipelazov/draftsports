@@ -38,6 +38,11 @@ interface ESPNCompetitor {
   score: string
 }
 
+interface ESPNBroadcast {
+  market: string
+  names: string[]
+}
+
 interface ESPNEvent {
   id: string
   date: string
@@ -50,7 +55,24 @@ interface ESPNEvent {
       state: string
     }
   }
-  competitions: Array<{ competitors: ESPNCompetitor[] }>
+  competitions: Array<{
+    competitors: ESPNCompetitor[]
+    broadcasts?: ESPNBroadcast[]
+  }>
+}
+
+function formatBRT(isoDate: string): { time: string; weekday: string } {
+  const d = new Date(isoDate)
+  const time = d.toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'America/Sao_Paulo',
+  })
+  const weekday = d.toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    timeZone: 'America/Sao_Paulo',
+  })
+  return { time, weekday }
 }
 
 export async function GET(request: Request) {
@@ -98,12 +120,26 @@ export async function GET(request: Request) {
       if (event.status.type.state === 'in') status = 'live'
       else if (event.status.type.state === 'post') status = 'final'
 
+      const { time, weekday } = formatBRT(event.date)
+
+      // Collect broadcast names
+      const broadcasts = comp.broadcasts || []
+      const channels: string[] = []
+      for (const b of broadcasts) {
+        for (const name of b.names) {
+          if (!channels.includes(name)) channels.push(name)
+        }
+      }
+
       return {
         id: event.id,
         date: event.date,
         name: event.shortName,
         status,
         statusDetail: event.status.type.shortDetail,
+        timeBRT: time,
+        weekday,
+        broadcasts: channels,
         homeTeam: {
           name: home?.team.shortDisplayName || home?.team.name || '',
           fullName: home?.team.displayName || '',
