@@ -86,6 +86,15 @@ export interface ThemeColors {
   text_muted: string
 }
 
+export interface SiteLinks {
+  whatsapp_number: string
+  whatsapp_message: string
+  instagram_url: string
+  twitter_url: string
+  youtube_url: string
+  email: string
+}
+
 export interface OrderItem {
   id: string
   order_id: string

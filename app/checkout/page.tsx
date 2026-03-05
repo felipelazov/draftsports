@@ -34,10 +34,64 @@ export default function CheckoutPage() {
   const [copied, setCopied] = useState(false)
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
+  const [couponCode, setCouponCode] = useState('')
+  const [couponDiscount, setCouponDiscount] = useState(0)
+  const [couponApplied, setCouponApplied] = useState<string | null>(null)
+  const [couponError, setCouponError] = useState<string | null>(null)
+  const [shippingCep, setShippingCep] = useState('')
+  const [shippingCalc, setShippingCalc] = useState<{ value: number; days: number } | null>(null)
+  const [shippingLoading, setShippingLoading] = useState(false)
+
   const subtotal = total()
   const pixDiscount = paymentMethod === 'pix' ? subtotal * 0.05 : 0
-  const shipping = subtotal >= 299 ? 0 : 29.90
-  const grandTotal = subtotal - pixDiscount + shipping
+  const shippingValue = shippingCalc ? shippingCalc.value : (subtotal >= 299 ? 0 : 29.90)
+  const grandTotal = subtotal - pixDiscount - couponDiscount + shippingValue
+
+  const applyCoupon = () => {
+    setCouponError(null)
+    const code = couponCode.trim().toUpperCase()
+    if (!code) return
+    // Cupons locais — pode ser movido para API/Supabase depois
+    const coupons: Record<string, { type: 'percent' | 'fixed'; value: number }> = {
+      'PRIMEIRACOMPRA': { type: 'percent', value: 10 },
+      'DRAFT10': { type: 'percent', value: 10 },
+      'DRAFT20': { type: 'fixed', value: 20 },
+      'FRETEGRATIS': { type: 'fixed', value: shippingValue },
+    }
+    const coupon = coupons[code]
+    if (!coupon) {
+      setCouponError('Cupom inválido')
+      return
+    }
+    const discount = coupon.type === 'percent' ? subtotal * (coupon.value / 100) : coupon.value
+    setCouponDiscount(discount)
+    setCouponApplied(code)
+  }
+
+  const removeCoupon = () => {
+    setCouponDiscount(0)
+    setCouponApplied(null)
+    setCouponCode('')
+    setCouponError(null)
+  }
+
+  const calcShipping = async () => {
+    const cep = shippingCep.replace(/\D/g, '')
+    if (cep.length !== 8) return
+    setShippingLoading(true)
+    // Simulação por região — pode integrar com Correios/Melhor Envio depois
+    await new Promise(r => setTimeout(r, 800))
+    const region = parseInt(cep.substring(0, 1))
+    let value = 19.90
+    let days = 7
+    if (region <= 1) { value = 0; days = 5 } // SP
+    else if (region <= 3) { value = 14.90; days = 7 } // RJ/MG/ES
+    else if (region <= 5) { value = 24.90; days = 10 } // Sul/Centro-Oeste
+    else { value = 34.90; days = 12 } // Norte/Nordeste
+    if (subtotal >= 299) { value = 0 }
+    setShippingCalc({ value, days })
+    setShippingLoading(false)
+  }
 
   // Polling PIX status
   const startPixPolling = useCallback((oid: string) => {
@@ -526,6 +580,57 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
+              {/* Cupom de desconto */}
+              <div className="border-t border-gray-100 pt-4 mb-4">
+                {couponApplied ? (
+                  <div className="flex items-center justify-between bg-[#00B894]/10 px-3 py-2 rounded-lg">
+                    <span className="text-sm text-[#00B894] font-medium">Cupom {couponApplied}</span>
+                    <button onClick={removeCoupon} className="text-xs text-[#636E72] hover:text-red-500">Remover</button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      placeholder="Cupom de desconto"
+                      className="flex-1 px-3 py-2 text-xs bg-[#F8F9FE] rounded-lg border border-gray-200 outline-none focus:border-[#6C5CE7]"
+                    />
+                    <button onClick={applyCoupon} className="px-3 py-2 text-xs font-semibold text-[#6C5CE7] border border-[#6C5CE7] rounded-lg hover:bg-[#6C5CE7]/5">
+                      Aplicar
+                    </button>
+                  </div>
+                )}
+                {couponError && <p className="text-xs text-red-500 mt-1">{couponError}</p>}
+              </div>
+
+              {/* Calcular frete */}
+              <div className="mb-4">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={shippingCep}
+                    onChange={(e) => setShippingCep(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                    placeholder="CEP para frete"
+                    maxLength={8}
+                    className="flex-1 px-3 py-2 text-xs bg-[#F8F9FE] rounded-lg border border-gray-200 outline-none focus:border-[#6C5CE7]"
+                  />
+                  <button onClick={calcShipping} disabled={shippingLoading} className="px-3 py-2 text-xs font-semibold text-[#6C5CE7] border border-[#6C5CE7] rounded-lg hover:bg-[#6C5CE7]/5">
+                    {shippingLoading ? '...' : 'Calcular'}
+                  </button>
+                </div>
+                {shippingCalc && (
+                  <p className="text-xs text-[#636E72] mt-1">
+                    {shippingCalc.value === 0 ? (
+                      <span className="text-[#00B894] font-medium">Frete grátis! </span>
+                    ) : (
+                      <span>{formatPrice(shippingCalc.value)} — </span>
+                    )}
+                    Entrega em {shippingCalc.days} dias úteis
+                  </p>
+                )}
+              </div>
+
               <div className="space-y-2 border-t border-gray-100 pt-4 text-sm">
                 <div className="flex justify-between">
                   <span className="text-[#636E72]">Subtotal</span>
@@ -537,10 +642,16 @@ export default function CheckoutPage() {
                     <span>-{formatPrice(pixDiscount)}</span>
                   </div>
                 )}
+                {couponDiscount > 0 && (
+                  <div className="flex justify-between text-[#00B894]">
+                    <span>Cupom {couponApplied}</span>
+                    <span>-{formatPrice(couponDiscount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-[#636E72]">Frete</span>
-                  <span className={shipping === 0 ? 'text-[#00B894]' : ''}>
-                    {shipping === 0 ? 'Gratis' : formatPrice(shipping)}
+                  <span className={shippingValue === 0 ? 'text-[#00B894]' : ''}>
+                    {shippingValue === 0 ? 'Gratis' : formatPrice(shippingValue)}
                   </span>
                 </div>
                 <hr className="border-gray-100" />
@@ -575,10 +686,26 @@ export default function CheckoutPage() {
                 </p>
               )}
 
-              <p className="text-[10px] text-center text-[#636E72] mt-3">
-                <Lock size={10} className="inline mr-1" />
-                Pagamento seguro com criptografia SSL
-              </p>
+              {/* Selos de seguranca */}
+              <div className="mt-6 pt-4 border-t border-gray-100">
+                <div className="flex items-center justify-center gap-4 flex-wrap">
+                  <div className="flex items-center gap-1.5 text-[10px] text-[#636E72]">
+                    <Lock size={12} className="text-[#00B894]" />
+                    <span>Compra Segura</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[10px] text-[#636E72]">
+                    <Check size={12} className="text-[#00B894]" />
+                    <span>Dados Protegidos</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[10px] text-[#636E72]">
+                    <CreditCard size={12} className="text-[#00B894]" />
+                    <span>Mercado Pago</span>
+                  </div>
+                </div>
+                <p className="text-[10px] text-center text-[#636E72] mt-2">
+                  Pagamento processado com criptografia SSL via Mercado Pago
+                </p>
+              </div>
             </motion.div>
           </div>
         </div>

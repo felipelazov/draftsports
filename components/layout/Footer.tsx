@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { Instagram, Twitter, Youtube, Mail } from 'lucide-react'
+import { Instagram, Twitter, Youtube } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 
 const footerLinks = {
   Ligas: [
@@ -13,20 +14,28 @@ const footerLinks = {
     { name: 'Futebol', href: '/catalogo/futebol' },
   ],
   Institucional: [
-    { name: 'Sobre Nós', href: '#' },
-    { name: 'Política de Privacidade', href: '#' },
-    { name: 'Termos de Uso', href: '#' },
-    { name: 'Trocas e Devoluções', href: '#' },
+    { name: 'Sobre Nós', href: '/sobre' },
+    { name: 'Política de Privacidade', href: '/privacidade' },
+    { name: 'Termos de Uso', href: '/termos' },
+    { name: 'Trocas e Devoluções', href: '/trocas' },
   ],
   Ajuda: [
-    { name: 'Central de Ajuda', href: '#' },
-    { name: 'Rastrear Pedido', href: '#' },
-    { name: 'Guia de Tamanhos', href: '#' },
-    { name: 'Contato', href: '#' },
+    { name: 'Perguntas Frequentes', href: '/faq' },
+    { name: 'Rastrear Pedido', href: '/conta/pedidos' },
+    { name: 'Guia de Tamanhos', href: '/tamanhos' },
+    { name: 'Contato', href: '/contato' },
   ],
 }
 
 export function Footer() {
+  const { links } = useSiteSettings()
+
+  const socialLinks = [
+    { icon: Instagram, url: links.instagram_url, label: 'Instagram' },
+    { icon: Twitter, url: links.twitter_url, label: 'Twitter' },
+    { icon: Youtube, url: links.youtube_url, label: 'YouTube' },
+  ]
+
   return (
     <footer className="bg-[#2D3436] text-white">
       {/* Newsletter */}
@@ -74,11 +83,14 @@ export function Footer() {
               Autenticidade e estilo em cada peça.
             </p>
             <div className="flex gap-3 mt-4">
-              {[Instagram, Twitter, Youtube].map((Icon, i) => (
+              {socialLinks.map(({ icon: Icon, url, label }) => (
                 <a
-                  key={i}
-                  href="#"
+                  key={label}
+                  href={url || '#'}
+                  target={url ? '_blank' : undefined}
+                  rel={url ? 'noopener noreferrer' : undefined}
                   className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#6C5CE7] transition-colors"
+                  aria-label={label}
                 >
                   <Icon size={18} />
                 </a>

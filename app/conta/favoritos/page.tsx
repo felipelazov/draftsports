@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowLeft, Heart, Loader2 } from 'lucide-react'
+import { ArrowLeft, Heart, Loader2, Share2, Check } from 'lucide-react'
 import { useFavorites } from '@/hooks/useFavorites'
 import { ProductCard } from '@/components/catalog/ProductCard'
 import { Button } from '@/components/ui/Button'
@@ -13,6 +13,16 @@ export default function FavoritosPage() {
   const { favorites } = useFavorites()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [copied, setCopied] = useState(false)
+
+  const shareList = () => {
+    const ids = favorites.join(',')
+    const url = `${window.location.origin}/lista?ids=${ids}`
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
 
   useEffect(() => {
     if (favorites.length === 0) {
@@ -42,9 +52,20 @@ export default function FavoritosPage() {
           Minha Conta
         </Link>
 
-        <h1 className="text-3xl font-black text-[#2D3436] mb-8">
-          Favoritos ({products.length})
-        </h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-black text-[#2D3436]">
+            Favoritos ({products.length})
+          </h1>
+          {products.length > 0 && (
+            <button
+              onClick={shareList}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl border border-gray-200 hover:border-[#6C5CE7] hover:text-[#6C5CE7] transition-colors"
+            >
+              {copied ? <Check size={16} /> : <Share2 size={16} />}
+              {copied ? 'Link copiado!' : 'Compartilhar'}
+            </button>
+          )}
+        </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-20">

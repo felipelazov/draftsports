@@ -73,6 +73,14 @@ export function Header() {
                   <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-[#6C5CE7] to-[#A29BFE] group-hover:w-3/4 transition-all duration-300" />
                 </Link>
               ))}
+              <span className="w-px h-5 bg-gray-200 mx-1" />
+              <Link
+                href="/nba"
+                className="relative px-4 py-2 text-sm font-semibold text-[#6C5CE7] hover:text-[#5A4BD1] transition-colors group"
+              >
+                Jogos ao Vivo
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-[#6C5CE7] to-[#A29BFE] group-hover:w-3/4 transition-all duration-300" />
+              </Link>
               <Link
                 href="/catalogo"
                 className="px-4 py-2 text-sm font-medium text-[#6C5CE7] hover:text-[#5A4BD1] transition-colors"
@@ -158,6 +166,13 @@ export function Header() {
                   </Link>
                 ))}
                 <hr className="my-2 border-gray-100" />
+                <Link
+                  href="/nba"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-4 py-3 text-lg font-semibold text-[#6C5CE7]"
+                >
+                  Jogos ao Vivo
+                </Link>
                 <Link
                   href="/catalogo"
                   onClick={() => setMobileMenuOpen(false)}

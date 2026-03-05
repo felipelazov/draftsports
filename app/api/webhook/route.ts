@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { payment as mpPayment } from '@/lib/mercadopago'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { sendPaymentApproved } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,6 +29,24 @@ export async function POST(request: NextRequest) {
           .from('orders')
           .update({ status: newStatus })
           .eq('id', order.id)
+
+        // Enviar email quando pagamento aprovado
+        if (newStatus === 'pago') {
+          const { data: fullOrder } = await supabaseAdmin
+            .from('orders')
+            .select('user_id, shipping_address')
+            .eq('id', order.id)
+            .single()
+
+          if (fullOrder) {
+            const { data: profile } = await supabaseAdmin.auth.admin.getUserById(fullOrder.user_id)
+            const email = profile?.user?.email
+            const name = (fullOrder.shipping_address as { name?: string })?.name || 'Cliente'
+            if (email) {
+              sendPaymentApproved(email, name, order.id).catch(() => {})
+            }
+          }
+        }
       }
     }
 

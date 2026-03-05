@@ -138,6 +138,9 @@ export function ProductCard({ product }: ProductCardProps) {
               </span>
             )}
           </div>
+          <p className="text-[11px] text-[#00B894] font-medium mt-0.5">
+            ou 12x de {formatPrice(product.price / 12)}
+          </p>
           <div className="flex gap-1 mt-2.5">
             {product.sizes.slice(0, 4).map((size) => (
               <span

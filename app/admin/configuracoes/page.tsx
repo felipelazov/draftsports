@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { Save, Loader2, RotateCcw, Image as ImageIcon, Upload, X } from 'lucide-react'
-import type { HeroBanner, PromoBanner, ThemeColors } from '@/types'
+import { Save, Loader2, RotateCcw, Image as ImageIcon, Upload, X, Link2, MessageCircle } from 'lucide-react'
+import type { HeroBanner, PromoBanner, ThemeColors, SiteLinks } from '@/types'
 
 const defaultTheme: ThemeColors = {
   primary: '#6C5CE7',
@@ -40,7 +40,16 @@ const defaultPromo: PromoBanner = {
   background_image: null,
 }
 
-type Tab = 'banners' | 'design'
+const defaultLinks: SiteLinks = {
+  whatsapp_number: '5511999999999',
+  whatsapp_message: 'Olá! Vim pelo site DRAFT e gostaria de mais informações.',
+  instagram_url: '',
+  twitter_url: '',
+  youtube_url: '',
+  email: 'contato@draftsports.com.br',
+}
+
+type Tab = 'banners' | 'design' | 'links'
 
 const colorGroups = [
   {
@@ -79,6 +88,23 @@ const colorGroups = [
   },
 ]
 
+const themeVarMap: Record<string, string> = {
+  primary: '--primary',
+  primary_dark: '--primary-dark',
+  primary_light: '--primary-light',
+  accent: '--accent',
+  success: '--success',
+  warning: '--warning',
+  info: '--info',
+  bg: '--bg',
+  bg_elevated: '--bg-elevated',
+  bg_sunken: '--bg-sunken',
+  card: '--card',
+  text: '--text',
+  text_secondary: '--text-secondary',
+  text_muted: '--text-muted',
+}
+
 export default function ConfiguracoesPage() {
   const [tab, setTab] = useState<Tab>('banners')
   const [loading, setLoading] = useState(true)
@@ -88,6 +114,7 @@ export default function ConfiguracoesPage() {
   const [hero, setHero] = useState<HeroBanner>(defaultHero)
   const [promo, setPromo] = useState<PromoBanner>(defaultPromo)
   const [theme, setTheme] = useState<ThemeColors>(defaultTheme)
+  const [links, setLinks] = useState<SiteLinks>(defaultLinks)
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -100,6 +127,7 @@ export default function ConfiguracoesPage() {
           if (s.setting_key === 'hero_banner') setHero({ ...defaultHero, ...s.setting_value })
           if (s.setting_key === 'promo_banner') setPromo({ ...defaultPromo, ...s.setting_value })
           if (s.setting_key === 'theme_colors') setTheme({ ...defaultTheme, ...s.setting_value })
+          if (s.setting_key === 'site_links') setLinks({ ...defaultLinks, ...s.setting_value })
         }
       })
       .catch(() => {})
@@ -136,9 +164,28 @@ export default function ConfiguracoesPage() {
     setMessage(null)
     try {
       await saveSetting('theme_colors', theme as unknown as Record<string, unknown>)
-      setMessage({ type: 'success', text: 'Tema salvo com sucesso! Recarregue a pagina para ver as alteracoes.' })
+      // Aplicar CSS variables imediatamente
+      const root = document.documentElement
+      for (const [key, value] of Object.entries(theme)) {
+        const varName = themeVarMap[key]
+        if (varName) root.style.setProperty(varName, value)
+      }
+      setMessage({ type: 'success', text: 'Tema salvo e aplicado!' })
     } catch {
       setMessage({ type: 'error', text: 'Erro ao salvar tema' })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleSaveLinks = async () => {
+    setSaving(true)
+    setMessage(null)
+    try {
+      await saveSetting('site_links', links as unknown as Record<string, unknown>)
+      setMessage({ type: 'success', text: 'Links salvos com sucesso! As alteracoes aparecerao no site.' })
+    } catch {
+      setMessage({ type: 'error', text: 'Erro ao salvar links' })
     } finally {
       setSaving(false)
     }
@@ -170,7 +217,24 @@ export default function ConfiguracoesPage() {
     }
   }
 
-  const resetTheme = () => setTheme(defaultTheme)
+  const resetTheme = async () => {
+    setTheme(defaultTheme)
+    setSaving(true)
+    setMessage(null)
+    try {
+      await saveSetting('theme_colors', defaultTheme as unknown as Record<string, unknown>)
+      const root = document.documentElement
+      for (const [key, value] of Object.entries(defaultTheme)) {
+        const varName = themeVarMap[key]
+        if (varName) root.style.setProperty(varName, value)
+      }
+      setMessage({ type: 'success', text: 'Tema restaurado ao padrao!' })
+    } catch {
+      setMessage({ type: 'error', text: 'Erro ao restaurar tema' })
+    } finally {
+      setSaving(false)
+    }
+  }
 
   const inputClass =
     'w-full px-4 py-2.5 bg-[#F8F9FE] rounded-xl border border-gray-200 text-sm text-[#2D3436] outline-none focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/10'
@@ -190,22 +254,21 @@ export default function ConfiguracoesPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6 w-fit">
-        <button
-          onClick={() => { setTab('banners'); setMessage(null) }}
-          className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
-            tab === 'banners' ? 'bg-white text-[#2D3436] shadow-sm' : 'text-[#636E72] hover:text-[#2D3436]'
-          }`}
-        >
-          Banners
-        </button>
-        <button
-          onClick={() => { setTab('design'); setMessage(null) }}
-          className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
-            tab === 'design' ? 'bg-white text-[#2D3436] shadow-sm' : 'text-[#636E72] hover:text-[#2D3436]'
-          }`}
-        >
-          Design System
-        </button>
+        {[
+          { id: 'banners' as Tab, label: 'Banners' },
+          { id: 'design' as Tab, label: 'Design System' },
+          { id: 'links' as Tab, label: 'Links & Redes' },
+        ].map((t) => (
+          <button
+            key={t.id}
+            onClick={() => { setTab(t.id); setMessage(null) }}
+            className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
+              tab === t.id ? 'bg-white text-[#2D3436] shadow-sm' : 'text-[#636E72] hover:text-[#2D3436]'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
       {message && (
@@ -285,7 +348,6 @@ export default function ConfiguracoesPage() {
               <div className="border-t border-gray-100 pt-4">
                 <h4 className="text-sm font-semibold text-[#2D3436] mb-3">Midia do Card (foto ou video)</h4>
                 <div className="space-y-3">
-                  {/* Upload area */}
                   <div>
                     <input
                       ref={fileInputRef}
@@ -318,7 +380,6 @@ export default function ConfiguracoesPage() {
                     </button>
                   </div>
 
-                  {/* Ou URL manual */}
                   <div className="flex items-center gap-3">
                     <div className="flex-1 h-px bg-gray-200" />
                     <span className="text-xs text-[#636E72]">ou cole uma URL</span>
@@ -349,7 +410,6 @@ export default function ConfiguracoesPage() {
                     )}
                   </div>
 
-                  {/* Preview */}
                   {hero.card_media && (
                     <div className="relative rounded-xl overflow-hidden border border-gray-200 max-w-[200px]">
                       {hero.card_media_type === 'video' ? (
@@ -524,7 +584,7 @@ export default function ConfiguracoesPage() {
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <h3 className="text-lg font-bold text-[#2D3436] mb-4">Preview</h3>
             <div className="rounded-xl p-6" style={{ background: theme.bg }}>
-              <div className="flex gap-4 mb-4">
+              <div className="flex gap-4 mb-4 flex-wrap">
                 <div className="px-4 py-2 rounded-lg text-white text-sm font-semibold" style={{ background: theme.primary }}>
                   Primary
                 </div>
@@ -549,7 +609,8 @@ export default function ConfiguracoesPage() {
           <div className="flex gap-3">
             <button
               onClick={resetTheme}
-              className="flex items-center gap-2 px-6 py-3 bg-gray-100 text-[#636E72] rounded-xl font-semibold hover:bg-gray-200 transition-colors"
+              disabled={saving}
+              className="flex items-center gap-2 px-6 py-3 bg-gray-100 text-[#636E72] rounded-xl font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50"
             >
               <RotateCcw size={16} />
               Restaurar Padrao
@@ -563,6 +624,109 @@ export default function ConfiguracoesPage() {
               {saving ? 'Salvando...' : 'Salvar Tema'}
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Links & Redes Tab */}
+      {tab === 'links' && (
+        <div className="space-y-8">
+          {/* WhatsApp */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-[#2D3436] mb-4 flex items-center gap-2">
+              <MessageCircle size={20} className="text-[#25D366]" />
+              WhatsApp
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-[#636E72] mb-1.5">
+                  Numero (com DDI + DDD, sem espacos)
+                </label>
+                <input
+                  type="text"
+                  value={links.whatsapp_number}
+                  onChange={(e) => setLinks({ ...links, whatsapp_number: e.target.value.replace(/\D/g, '') })}
+                  placeholder="5511999999999"
+                  className={inputClass}
+                />
+                <p className="text-xs text-[#636E72] mt-1">Ex: 5511999999999 (55 = Brasil, 11 = DDD)</p>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#636E72] mb-1.5">
+                  Mensagem padrao
+                </label>
+                <textarea
+                  value={links.whatsapp_message}
+                  onChange={(e) => setLinks({ ...links, whatsapp_message: e.target.value })}
+                  rows={2}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Redes Sociais */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-[#2D3436] mb-4 flex items-center gap-2">
+              <Link2 size={20} className="text-[#6C5CE7]" />
+              Redes Sociais
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-[#636E72] mb-1.5">Instagram</label>
+                <input
+                  type="url"
+                  value={links.instagram_url}
+                  onChange={(e) => setLinks({ ...links, instagram_url: e.target.value })}
+                  placeholder="https://instagram.com/sua_loja"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#636E72] mb-1.5">Twitter / X</label>
+                <input
+                  type="url"
+                  value={links.twitter_url}
+                  onChange={(e) => setLinks({ ...links, twitter_url: e.target.value })}
+                  placeholder="https://x.com/sua_loja"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#636E72] mb-1.5">YouTube</label>
+                <input
+                  type="url"
+                  value={links.youtube_url}
+                  onChange={(e) => setLinks({ ...links, youtube_url: e.target.value })}
+                  placeholder="https://youtube.com/@sua_loja"
+                  className={inputClass}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Contato */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-[#2D3436] mb-4">Contato</h3>
+            <div>
+              <label className="block text-xs font-medium text-[#636E72] mb-1.5">E-mail de contato</label>
+              <input
+                type="email"
+                value={links.email}
+                onChange={(e) => setLinks({ ...links, email: e.target.value })}
+                placeholder="contato@suaempresa.com"
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={handleSaveLinks}
+            disabled={saving}
+            className="flex items-center gap-2 px-6 py-3 bg-[var(--primary)] text-white rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+            {saving ? 'Salvando...' : 'Salvar Links'}
+          </button>
         </div>
       )}
     </div>

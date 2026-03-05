@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { createOrder } from '@/lib/supabase-admin'
 import { payment } from '@/lib/mercadopago'
+import { sendOrderConfirmation } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -55,6 +56,21 @@ export async function POST(request: NextRequest) {
         }))
       )
 
+      // Enviar email de confirmacao (async, nao bloqueia resposta)
+      sendOrderConfirmation({
+        to: payerEmail || user.email || '',
+        customerName: shippingAddress.name || 'Cliente',
+        orderId: order.id,
+        total,
+        items: items.map((i: { name?: string; quantity: number; size: string; price: number }) => ({
+          name: i.name || 'Produto',
+          quantity: i.quantity,
+          size: i.size,
+          price: i.price,
+        })),
+        paymentMethod,
+      }).catch(() => {})
+
       if (mpPayment.status === 'rejected') {
         return NextResponse.json({
           success: false,
@@ -100,6 +116,20 @@ export async function POST(request: NextRequest) {
           price: item.price,
         }))
       )
+
+      sendOrderConfirmation({
+        to: payerEmail || user.email || '',
+        customerName: shippingAddress.name || 'Cliente',
+        orderId: order.id,
+        total,
+        items: items.map((i: { name?: string; quantity: number; size: string; price: number }) => ({
+          name: i.name || 'Produto',
+          quantity: i.quantity,
+          size: i.size,
+          price: i.price,
+        })),
+        paymentMethod,
+      }).catch(() => {})
 
       const pixData = mpPayment.point_of_interaction?.transaction_data
 

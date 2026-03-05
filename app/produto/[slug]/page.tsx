@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Heart, ShoppingBag, Truck, Shield, RotateCcw, Check, Minus, Plus, AlertCircle, Loader2 } from 'lucide-react'
+import { Heart, ShoppingBag, Truck, Shield, RotateCcw, Check, Minus, Plus, AlertCircle, Loader2, Bell } from 'lucide-react'
 import { Size, Product } from '@/types'
 import { formatPrice, calculateDiscount } from '@/lib/utils'
 import { Badge } from '@/components/ui/Badge'
@@ -26,6 +26,8 @@ export default function ProductPage() {
   const [selectedSize, setSelectedSize] = useState<Size | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [addedToCart, setAddedToCart] = useState(false)
+  const [notifyEmail, setNotifyEmail] = useState('')
+  const [notifySubmitted, setNotifySubmitted] = useState(false)
   const { addItem, openCart } = useCart()
   const { toggleFavorite, isFavorite } = useFavorites()
 
@@ -73,6 +75,14 @@ export default function ProductPage() {
       setAddedToCart(false)
       openCart()
     }, 1000)
+  }
+
+  const handleNotifyStock = () => {
+    if (!notifyEmail || !product) return
+    const stored = JSON.parse(localStorage.getItem('draft-stock-alerts') || '[]')
+    stored.push({ productId: product.id, productName: product.name, email: notifyEmail, date: new Date().toISOString() })
+    localStorage.setItem('draft-stock-alerts', JSON.stringify(stored))
+    setNotifySubmitted(true)
   }
 
   return (
@@ -181,83 +191,124 @@ export default function ProductPage() {
               onSelect={setSelectedSize}
             />
 
-            {/* Quantity */}
-            <div className="mt-6">
-              <h3 className="text-sm font-semibold text-[#2D3436] mb-3">
-                Quantidade
-              </h3>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center bg-[#F8F9FE] rounded-xl">
-                  <button
-                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="w-10 h-10 flex items-center justify-center hover:text-[#6C5CE7] transition-colors"
-                  >
-                    <Minus size={16} />
-                  </button>
-                  <span className="w-8 text-center font-semibold">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() => setQuantity((q) => q + 1)}
-                    className="w-10 h-10 flex items-center justify-center hover:text-[#6C5CE7] transition-colors"
-                  >
-                    <Plus size={16} />
-                  </button>
+            {product.stock === 0 ? (
+              /* Out of Stock - Notify */
+              <div className="mt-6 p-5 bg-[#FFF3E0] rounded-2xl">
+                <div className="flex items-center gap-2 mb-3">
+                  <AlertCircle size={18} className="text-orange-600" />
+                  <span className="font-bold text-orange-800 text-sm">Produto esgotado</span>
                 </div>
-                <span className="text-sm text-[#636E72]">
-                  {product.stock} em estoque
-                </span>
+                {notifySubmitted ? (
+                  <div className="flex items-center gap-2 text-sm text-green-700">
+                    <Check size={16} />
+                    <span>Pronto! Voce sera avisado quando voltar ao estoque.</span>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-sm text-orange-700 mb-3">
+                      Deixe seu e-mail e avisaremos quando este produto voltar.
+                    </p>
+                    <div className="flex gap-2">
+                      <input
+                        type="email"
+                        placeholder="seu@email.com"
+                        value={notifyEmail}
+                        onChange={(e) => setNotifyEmail(e.target.value)}
+                        className="flex-1 px-4 py-2.5 rounded-xl border border-orange-200 text-sm focus:outline-none focus:border-orange-400 bg-white"
+                      />
+                      <button
+                        onClick={handleNotifyStock}
+                        disabled={!notifyEmail}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-orange-500 text-white rounded-xl text-sm font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50"
+                      >
+                        <Bell size={16} />
+                        Avisar
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
-            </div>
+            ) : (
+              <>
+                {/* Quantity */}
+                <div className="mt-6">
+                  <h3 className="text-sm font-semibold text-[#2D3436] mb-3">
+                    Quantidade
+                  </h3>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center bg-[#F8F9FE] rounded-xl">
+                      <button
+                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                        className="w-10 h-10 flex items-center justify-center hover:text-[#6C5CE7] transition-colors"
+                      >
+                        <Minus size={16} />
+                      </button>
+                      <span className="w-8 text-center font-semibold">
+                        {quantity}
+                      </span>
+                      <button
+                        onClick={() => setQuantity((q) => q + 1)}
+                        className="w-10 h-10 flex items-center justify-center hover:text-[#6C5CE7] transition-colors"
+                      >
+                        <Plus size={16} />
+                      </button>
+                    </div>
+                    <span className="text-sm text-[#636E72]">
+                      {product.stock} em estoque
+                    </span>
+                  </div>
+                </div>
 
-            {/* Actions */}
-            <div className="flex gap-3 mt-8">
-              <Button
-                onClick={handleAddToCart}
-                disabled={!selectedSize}
-                size="lg"
-                className="flex-1 flex items-center justify-center gap-2"
-              >
-                <AnimatePresence mode="wait">
-                  {addedToCart ? (
-                    <motion.span
-                      key="added"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0 }}
-                      className="flex items-center gap-2"
-                    >
-                      <Check size={20} /> Adicionado!
-                    </motion.span>
-                  ) : (
-                    <motion.span
-                      key="add"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0 }}
-                      className="flex items-center gap-2"
-                    >
-                      <ShoppingBag size={20} />
-                      {selectedSize ? 'Adicionar ao Carrinho' : 'Selecione o Tamanho'}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </Button>
-              <motion.button
-                whileTap={{ scale: 1.2 }}
-                onClick={() => toggleFavorite(product.id)}
-                className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all ${
-                  isFavorite(product.id)
-                    ? 'bg-[#FF6B6B]/10 text-[#FF6B6B]'
-                    : 'bg-[#F8F9FE] text-[#636E72] hover:text-[#FF6B6B]'
-                }`}
-              >
-                <Heart
-                  size={22}
-                  className={isFavorite(product.id) ? 'fill-current' : ''}
-                />
-              </motion.button>
-            </div>
+                {/* Actions */}
+                <div className="flex gap-3 mt-8">
+                  <Button
+                    onClick={handleAddToCart}
+                    disabled={!selectedSize}
+                    size="lg"
+                    className="flex-1 flex items-center justify-center gap-2"
+                  >
+                    <AnimatePresence mode="wait">
+                      {addedToCart ? (
+                        <motion.span
+                          key="added"
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          exit={{ scale: 0 }}
+                          className="flex items-center gap-2"
+                        >
+                          <Check size={20} /> Adicionado!
+                        </motion.span>
+                      ) : (
+                        <motion.span
+                          key="add"
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          exit={{ scale: 0 }}
+                          className="flex items-center gap-2"
+                        >
+                          <ShoppingBag size={20} />
+                          {selectedSize ? 'Adicionar ao Carrinho' : 'Selecione o Tamanho'}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </Button>
+                  <motion.button
+                    whileTap={{ scale: 1.2 }}
+                    onClick={() => toggleFavorite(product.id)}
+                    className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all ${
+                      isFavorite(product.id)
+                        ? 'bg-[#FF6B6B]/10 text-[#FF6B6B]'
+                        : 'bg-[#F8F9FE] text-[#636E72] hover:text-[#FF6B6B]'
+                    }`}
+                  >
+                    <Heart
+                      size={22}
+                      className={isFavorite(product.id) ? 'fill-current' : ''}
+                    />
+                  </motion.button>
+                </div>
+              </>
+            )}
 
             {/* Benefits */}
             <div className="grid grid-cols-3 gap-3 mt-8">
