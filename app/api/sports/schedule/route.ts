@@ -21,6 +21,7 @@ const SOCCER_LEAGUES: Record<string, string> = {
   'mls':               'soccer/usa.1',
   'libertadores':      'soccer/conmebol.libertadores',
   'copa-do-brasil':    'soccer/bra.copa_do_brasil',
+  'copa-do-mundo':     'soccer/fifa.world',
 }
 
 export const revalidate = 60

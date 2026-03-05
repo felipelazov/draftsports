@@ -50,6 +50,89 @@ function getToday(): string {
   return new Date().toISOString().split('T')[0]
 }
 
+function SubLeagueTabs({
+  leagues,
+  activeLeague,
+  onSelect,
+}: {
+  leagues: LeagueOption[]
+  activeLeague: string
+  onSelect: (key: string) => void
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [showLeft, setShowLeft] = useState(false)
+  const [showRight, setShowRight] = useState(false)
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current
+    if (!el) return
+    setShowLeft(el.scrollLeft > 4)
+    setShowRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 4)
+  }, [])
+
+  useEffect(() => {
+    checkScroll()
+    const el = scrollRef.current
+    if (!el) return
+    el.addEventListener('scroll', checkScroll, { passive: true })
+    window.addEventListener('resize', checkScroll)
+    return () => {
+      el.removeEventListener('scroll', checkScroll)
+      window.removeEventListener('resize', checkScroll)
+    }
+  }, [checkScroll])
+
+  const scroll = (dir: number) => {
+    scrollRef.current?.scrollBy({ left: dir * 160, behavior: 'smooth' })
+  }
+
+  return (
+    <div className="relative mb-4">
+      {/* Left arrow */}
+      {showLeft && (
+        <button
+          onClick={() => scroll(-1)}
+          className="absolute left-0 top-0 bottom-0 z-10 flex items-center pl-0.5 pr-2 bg-gradient-to-r from-[var(--bg)] via-[var(--bg)] to-transparent"
+          aria-label="Rolar para esquerda"
+        >
+          <ChevronLeft size={16} className="text-[var(--text-secondary)]" />
+        </button>
+      )}
+
+      {/* Scrollable tabs */}
+      <div
+        ref={scrollRef}
+        className="flex gap-1 overflow-x-auto scrollbar-hide px-1"
+      >
+        {leagues.map((league) => (
+          <button
+            key={league.key}
+            onClick={() => onSelect(league.key)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+              activeLeague === league.key
+                ? 'bg-[var(--text)] text-white'
+                : 'text-[var(--text-secondary)] hover:bg-gray-100'
+            }`}
+          >
+            {league.name}
+          </button>
+        ))}
+      </div>
+
+      {/* Right arrow */}
+      {showRight && (
+        <button
+          onClick={() => scroll(1)}
+          className="absolute right-0 top-0 bottom-0 z-10 flex items-center pr-0.5 pl-2 bg-gradient-to-l from-[var(--bg)] via-[var(--bg)] to-transparent"
+          aria-label="Rolar para direita"
+        >
+          <ChevronRight size={16} className="text-[var(--text-secondary)]" />
+        </button>
+      )}
+    </div>
+  )
+}
+
 export function SchedulePage({ sport }: { sport: SportConfig }) {
   const router = useRouter()
   const [date, setDate] = useState(getToday)
@@ -135,21 +218,11 @@ export function SchedulePage({ sport }: { sport: SportConfig }) {
 
         {/* Sub-league tabs (Soccer) */}
         {sport.leagues && sport.leagues.length > 0 && (
-          <div className="flex gap-1 overflow-x-auto scrollbar-hide mb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
-            {sport.leagues.map((league) => (
-              <button
-                key={league.key}
-                onClick={() => setActiveLeague(league.key)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
-                  activeLeague === league.key
-                    ? 'bg-[var(--text)] text-white'
-                    : 'text-[var(--text-secondary)] hover:bg-gray-100'
-                }`}
-              >
-                {league.name}
-              </button>
-            ))}
-          </div>
+          <SubLeagueTabs
+            leagues={sport.leagues}
+            activeLeague={activeLeague}
+            onSelect={setActiveLeague}
+          />
         )}
 
         {/* Header */}

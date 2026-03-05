@@ -19,6 +19,7 @@ export default function FutebolPage() {
           { key: 'mls', name: 'MLS' },
           { key: 'libertadores', name: 'Libertadores' },
           { key: 'copa-do-brasil', name: 'Copa do Brasil' },
+          { key: 'copa-do-mundo', name: 'Copa do Mundo' },
         ],
       }}
     />
