@@ -2,6 +2,7 @@
 
 import { Hero3D } from '@/components/home/Hero3D'
 import { CategoryGrid } from '@/components/home/CategoryGrid'
+import { LiveSportsSection } from '@/components/home/LiveSportsSection'
 import { FeaturedCarousel } from '@/components/home/FeaturedCarousel'
 import { NewArrivals } from '@/components/home/NewArrivals'
 import { PromoSection } from '@/components/home/PromoSection'
@@ -25,6 +26,7 @@ export function HomeClient({ heroBanner, promoBanner }: HomeClientProps) {
         cardMediaType={heroBanner?.card_media_type}
       />
       <CategoryGrid />
+      <LiveSportsSection />
       <FeaturedCarousel />
       <PromoSection
         title={promoBanner?.title}
