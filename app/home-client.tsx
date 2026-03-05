@@ -24,6 +24,10 @@ export function HomeClient({ heroBanner, promoBanner }: HomeClientProps) {
         backgroundImage={heroBanner?.background_image}
         cardMedia={heroBanner?.card_media}
         cardMediaType={heroBanner?.card_media_type}
+        badgeText={heroBanner?.badge_text}
+        secondaryCtaText={heroBanner?.secondary_cta_text}
+        secondaryCtaLink={heroBanner?.secondary_cta_link}
+        stats={heroBanner?.stats}
       />
       <CategoryGrid />
       <LiveSportsSection />

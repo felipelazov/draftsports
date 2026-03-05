@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingBag, Heart, User, Search, Menu, X } from 'lucide-react'
 import { useCart } from '@/hooks/useCart'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 
 const leagues = [
   { name: 'NBA', href: '/catalogo/nba' },
@@ -19,6 +20,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { openCart, itemCount } = useCart()
+  const { storeInfo } = useSiteSettings()
   const count = itemCount()
 
   useEffect(() => {
@@ -56,7 +58,7 @@ export function Header() {
                 className="text-2xl lg:text-3xl font-black tracking-tighter"
               >
                 <span className="bg-gradient-to-r from-[#6C5CE7] to-[#A29BFE] bg-clip-text text-transparent">
-                  DRAFT
+                  {storeInfo.name}
                 </span>
               </motion.div>
             </Link>

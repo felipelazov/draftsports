@@ -14,6 +14,7 @@ import { JerseyPlaceholder } from '@/components/ui/JerseyPlaceholder'
 import { AddressForm } from '@/components/checkout/AddressForm'
 import { PaymentForm } from '@/components/checkout/PaymentForm'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 
 interface PixData {
   qrCode: string
@@ -24,6 +25,7 @@ interface PixData {
 export default function CheckoutPage() {
   const { items, total, clearCart } = useCart()
   const router = useRouter()
+  const { checkoutConfig } = useSiteSettings()
   const [step, setStep] = useState<'info' | 'pix-waiting' | 'success'>('info')
   const [orderId, setOrderId] = useState<string | null>(null)
   const [paymentMethod, setPaymentMethod] = useState<'cartao' | 'pix'>('cartao')
@@ -44,22 +46,15 @@ export default function CheckoutPage() {
   const [shippingLoading, setShippingLoading] = useState(false)
 
   const subtotal = total()
-  const pixDiscount = paymentMethod === 'pix' ? subtotal * 0.05 : 0
-  const shippingValue = shippingCalc ? shippingCalc.value : (subtotal >= 299 ? 0 : 29.90)
+  const pixDiscount = paymentMethod === 'pix' ? subtotal * (checkoutConfig.pix_discount_percent / 100) : 0
+  const shippingValue = shippingCalc ? shippingCalc.value : (subtotal >= checkoutConfig.free_shipping_min ? 0 : 29.90)
   const grandTotal = subtotal - pixDiscount - couponDiscount + shippingValue
 
   const applyCoupon = () => {
     setCouponError(null)
     const code = couponCode.trim().toUpperCase()
     if (!code) return
-    // Cupons locais — pode ser movido para API/Supabase depois
-    const coupons: Record<string, { type: 'percent' | 'fixed'; value: number }> = {
-      'PRIMEIRACOMPRA': { type: 'percent', value: 10 },
-      'DRAFT10': { type: 'percent', value: 10 },
-      'DRAFT20': { type: 'fixed', value: 20 },
-      'FRETEGRATIS': { type: 'fixed', value: shippingValue },
-    }
-    const coupon = coupons[code]
+    const coupon = checkoutConfig.coupons.find(c => c.code === code && c.active)
     if (!coupon) {
       setCouponError('Cupom inválido')
       return
@@ -80,16 +75,13 @@ export default function CheckoutPage() {
     const cep = shippingCep.replace(/\D/g, '')
     if (cep.length !== 8) return
     setShippingLoading(true)
-    // Simulação por região — pode integrar com Correios/Melhor Envio depois
     await new Promise(r => setTimeout(r, 800))
     const region = parseInt(cep.substring(0, 1))
     let value = 19.90
     let days = 7
-    if (region <= 1) { value = 0; days = 5 } // SP
-    else if (region <= 3) { value = 14.90; days = 7 } // RJ/MG/ES
-    else if (region <= 5) { value = 24.90; days = 10 } // Sul/Centro-Oeste
-    else { value = 34.90; days = 12 } // Norte/Nordeste
-    if (subtotal >= 299) { value = 0 }
+    const matched = checkoutConfig.shipping_regions.find(r => region >= r.cep_start && region <= r.cep_end)
+    if (matched) { value = matched.price; days = matched.days }
+    if (subtotal >= checkoutConfig.free_shipping_min) { value = 0 }
     setShippingCalc({ value, days })
     setShippingLoading(false)
   }
@@ -645,7 +637,7 @@ export default function CheckoutPage() {
                 </div>
                 {pixDiscount > 0 && (
                   <div className="flex justify-between text-[#00B894]">
-                    <span>Desconto PIX (5%)</span>
+                    <span>Desconto PIX ({checkoutConfig.pix_discount_percent}%)</span>
                     <span>-{formatPrice(pixDiscount)}</span>
                   </div>
                 )}
@@ -696,18 +688,15 @@ export default function CheckoutPage() {
               {/* Selos de seguranca */}
               <div className="mt-6 pt-4 border-t border-gray-100">
                 <div className="flex items-center justify-center gap-4 flex-wrap">
-                  <div className="flex items-center gap-1.5 text-[10px] text-[#636E72]">
-                    <Lock size={12} className="text-[#00B894]" />
-                    <span>Compra Segura</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[10px] text-[#636E72]">
-                    <Check size={12} className="text-[#00B894]" />
-                    <span>Dados Protegidos</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[10px] text-[#636E72]">
-                    <CreditCard size={12} className="text-[#00B894]" />
-                    <span>Mercado Pago</span>
-                  </div>
+                  {checkoutConfig.security_seals.map((seal) => (
+                    <div key={seal.text} className="flex items-center gap-1.5 text-[10px] text-[#636E72]">
+                      {seal.icon === 'Lock' && <Lock size={12} className="text-[#00B894]" />}
+                      {seal.icon === 'Check' && <Check size={12} className="text-[#00B894]" />}
+                      {seal.icon === 'CreditCard' && <CreditCard size={12} className="text-[#00B894]" />}
+                      {seal.icon === 'Shield' && <Lock size={12} className="text-[#00B894]" />}
+                      <span>{seal.text}</span>
+                    </div>
+                  ))}
                 </div>
                 <p className="text-[10px] text-center text-[#636E72] mt-2">
                   Pagamento processado com criptografia SSL via Mercado Pago

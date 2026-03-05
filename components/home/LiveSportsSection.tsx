@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ChevronRight, Tv, Clock } from 'lucide-react'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 import type { Game } from '@/components/sports/GameCard'
 
 const SPORTS = [
@@ -93,6 +94,7 @@ function MiniGameSkeleton() {
 }
 
 export function LiveSportsSection() {
+  const { sections } = useSiteSettings()
   const [activeSport, setActiveSport] = useState('nba')
   const [games, setGames] = useState<Game[]>([])
   const [loading, setLoading] = useState(true)
@@ -140,7 +142,7 @@ export function LiveSportsSection() {
           >
             <div className="flex items-center gap-3 mb-2">
               <h2 className="text-3xl sm:text-4xl font-black text-white">
-                Jogos ao Vivo
+                {sections.live_title}
               </h2>
               {hasLive && (
                 <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2.5 py-1 rounded-full">
@@ -153,7 +155,7 @@ export function LiveSportsSection() {
               )}
             </div>
             <p className="text-white/50 text-sm sm:text-base">
-              Acompanhe os jogos de hoje e vista a camisa do seu time
+              {sections.live_subtitle}
             </p>
           </motion.div>
 

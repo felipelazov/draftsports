@@ -11,10 +11,12 @@ import { Rating } from '@/components/ui/Rating'
 import { JerseyPlaceholder } from '@/components/ui/JerseyPlaceholder'
 import { useFavorites } from '@/hooks/useFavorites'
 import { useCart } from '@/hooks/useCart'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 import type { Product } from '@/types'
 
 export function FeaturedCarousel() {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const { sections } = useSiteSettings()
   const { toggleFavorite, isFavorite } = useFavorites()
   const { addItem, openCart } = useCart()
   const [featured, setFeatured] = useState<Product[]>([])
@@ -45,11 +47,10 @@ export function FeaturedCarousel() {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl sm:text-4xl font-black text-[#2D3436]">
-              Destaques da{' '}
-              <span className="gradient-text">semana</span>
+              {sections.featured_title}
             </h2>
             <p className="text-[#636E72] mt-2">
-              Os produtos mais populares escolhidos para você
+              {sections.featured_subtitle}
             </p>
           </motion.div>
 

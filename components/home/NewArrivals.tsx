@@ -12,6 +12,7 @@ import { JerseyPlaceholder } from '@/components/ui/JerseyPlaceholder'
 import { useFavorites } from '@/hooks/useFavorites'
 import { useCart } from '@/hooks/useCart'
 import { Button } from '@/components/ui/Button'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 import type { Product } from '@/types'
 
 const container = {
@@ -28,6 +29,7 @@ const item = {
 }
 
 export function NewArrivals() {
+  const { sections } = useSiteSettings()
   const { toggleFavorite, isFavorite } = useFavorites()
   const { addItem, openCart } = useCart()
   const [newArrivals, setNewArrivals] = useState<Product[]>([])
@@ -48,11 +50,10 @@ export function NewArrivals() {
         className="text-center mb-12"
       >
         <h2 className="text-3xl sm:text-4xl font-black text-[#2D3436]">
-          Novos{' '}
-          <span className="gradient-text">lançamentos</span>
+          {sections.new_arrivals_title}
         </h2>
         <p className="text-[#636E72] mt-3 text-lg">
-          As últimas camisas que acabaram de chegar
+          {sections.new_arrivals_subtitle}
         </p>
       </motion.div>
 
@@ -161,7 +162,7 @@ export function NewArrivals() {
       >
         <Link href="/catalogo">
           <Button variant="outline" size="lg" className="group">
-            Ver Todo o Catálogo
+            {sections.new_arrivals_cta}
             <ArrowRight
               size={18}
               className="inline ml-2 group-hover:translate-x-1 transition-transform"

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { leagues } from '@/lib/mock-data'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 
 const container = {
   hidden: { opacity: 0 },
@@ -18,6 +19,7 @@ const item = {
 }
 
 export function CategoryGrid() {
+  const { sections } = useSiteSettings()
   return (
     <section className="py-20 px-4 sm:px-6 max-w-7xl mx-auto">
       <motion.div
@@ -27,11 +29,10 @@ export function CategoryGrid() {
         className="text-center mb-12"
       >
         <h2 className="text-3xl sm:text-4xl font-black text-[#2D3436]">
-          Escolha sua{' '}
-          <span className="gradient-text">liga</span>
+          {sections.categories_title}
         </h2>
         <p className="text-[#636E72] mt-3 text-lg">
-          As maiores ligas esportivas do mundo em um só lugar
+          {sections.categories_subtitle}
         </p>
       </motion.div>
 

@@ -16,6 +16,10 @@ import { RelatedProducts } from '@/components/product/RelatedProducts'
 import { VirtualTryOn } from '@/components/product/VirtualTryOn'
 import { useCart } from '@/hooks/useCart'
 import { useFavorites } from '@/hooks/useFavorites'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
+import type { LucideIcon } from 'lucide-react'
+
+const iconMap: Record<string, LucideIcon> = { Truck, Shield, RotateCcw }
 
 export default function ProductPage() {
   const params = useParams()
@@ -31,6 +35,7 @@ export default function ProductPage() {
   const [notifySubmitted, setNotifySubmitted] = useState(false)
   const { addItem, openCart } = useCart()
   const { toggleFavorite, isFavorite } = useFavorites()
+  const { productConfig } = useSiteSettings()
 
   useEffect(() => {
     setLoading(true)
@@ -174,7 +179,7 @@ export default function ProductPage() {
                 size="lg"
               />
               <p className="text-sm text-[#00B894] mt-1 font-medium">
-                ou 3x de {formatPrice(product.price / 3)} sem juros
+                ou {productConfig.installments}x de {formatPrice(product.price / productConfig.installments)} sem juros
               </p>
             </div>
 
@@ -203,7 +208,7 @@ export default function ProductPage() {
               <div className="mt-6 p-5 bg-[#FFF3E0] rounded-2xl">
                 <div className="flex items-center gap-2 mb-3">
                   <AlertCircle size={18} className="text-orange-600" />
-                  <span className="font-bold text-orange-800 text-sm">Produto esgotado</span>
+                  <span className="font-bold text-orange-800 text-sm">{productConfig.out_of_stock_title}</span>
                 </div>
                 {notifySubmitted ? (
                   <div className="flex items-center gap-2 text-sm text-green-700">
@@ -213,7 +218,7 @@ export default function ProductPage() {
                 ) : (
                   <>
                     <p className="text-sm text-orange-700 mb-3">
-                      Deixe seu e-mail e avisaremos quando este produto voltar.
+                      {productConfig.out_of_stock_message}
                     </p>
                     <div className="flex gap-2">
                       <input
@@ -322,26 +327,25 @@ export default function ProductPage() {
 
             {/* Benefits */}
             <div className="grid grid-cols-3 gap-3 mt-8">
-              {[
-                { icon: Truck, text: 'Frete Gratis', sub: 'Acima de R$ 299' },
-                { icon: Shield, text: '100% Original', sub: 'Garantia total' },
-                { icon: RotateCcw, text: 'Troca Facil', sub: 'Ate 30 dias' },
-              ].map(({ icon: Icon, text, sub }) => (
-                <div
-                  key={text}
-                  className="flex flex-col items-center gap-1.5 py-4 bg-[var(--bg)] rounded-xl text-center border border-[var(--border-light)] hover:border-[var(--primary-light)]/30 hover:shadow-[var(--shadow-sm)] transition-all"
-                >
-                  <div className="w-9 h-9 rounded-full bg-[var(--primary)]/10 flex items-center justify-center">
-                    <Icon size={16} className="text-[var(--primary)]" />
+              {productConfig.benefits.map((benefit) => {
+                const Icon = iconMap[benefit.icon] || Shield
+                return (
+                  <div
+                    key={benefit.title}
+                    className="flex flex-col items-center gap-1.5 py-4 bg-[var(--bg)] rounded-xl text-center border border-[var(--border-light)] hover:border-[var(--primary-light)]/30 hover:shadow-[var(--shadow-sm)] transition-all"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-[var(--primary)]/10 flex items-center justify-center">
+                      <Icon size={16} className="text-[var(--primary)]" />
+                    </div>
+                    <span className="text-xs font-semibold text-[var(--text)]">
+                      {benefit.title}
+                    </span>
+                    <span className="text-[10px] text-[var(--text-secondary)]">
+                      {benefit.subtitle}
+                    </span>
                   </div>
-                  <span className="text-xs font-semibold text-[var(--text)]">
-                    {text}
-                  </span>
-                  <span className="text-[10px] text-[var(--text-secondary)]">
-                    {sub}
-                  </span>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </motion.div>
         </div>

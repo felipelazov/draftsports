@@ -4,30 +4,12 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
-import { Zap, Truck, Shield, RotateCcw } from 'lucide-react'
+import { Zap, Truck, Shield, RotateCcw, Heart, Star, Check, type LucideIcon } from 'lucide-react'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 
-const features = [
-  {
-    icon: Truck,
-    title: 'Frete Grátis',
-    description: 'Em compras acima de R$ 299',
-  },
-  {
-    icon: Shield,
-    title: '100% Original',
-    description: 'Garantia de autenticidade',
-  },
-  {
-    icon: RotateCcw,
-    title: 'Troca Fácil',
-    description: '30 dias para trocar',
-  },
-  {
-    icon: Zap,
-    title: 'Entrega Rápida',
-    description: 'Receba em até 5 dias',
-  },
-]
+const iconMap: Record<string, LucideIcon> = {
+  Truck, Shield, RotateCcw, Zap, Heart, Star, Check,
+}
 
 interface PromoSectionProps {
   title?: string
@@ -39,6 +21,7 @@ interface PromoSectionProps {
 }
 
 export function PromoSection({ title, subtitle, badgeText, ctaText, ctaLink, backgroundImage }: PromoSectionProps = {}) {
+  const { features: featuresConfig } = useSiteSettings()
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -104,24 +87,27 @@ export function PromoSection({ title, subtitle, badgeText, ctaText, ctaLink, bac
       <section className="py-16 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="text-center group"
-              >
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#6C5CE7]/10 text-[#6C5CE7] mb-3 group-hover:bg-[#6C5CE7] group-hover:text-white transition-all duration-300">
-                  <feature.icon size={24} />
-                </div>
-                <h3 className="font-bold text-[#2D3436]">{feature.title}</h3>
-                <p className="text-sm text-[#636E72] mt-1">
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
+            {featuresConfig.items.map((feature, index) => {
+              const Icon = iconMap[feature.icon] || Zap
+              return (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="text-center group"
+                >
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#6C5CE7]/10 text-[#6C5CE7] mb-3 group-hover:bg-[#6C5CE7] group-hover:text-white transition-all duration-300">
+                    <Icon size={24} />
+                  </div>
+                  <h3 className="font-bold text-[#2D3436]">{feature.title}</h3>
+                  <p className="text-sm text-[#636E72] mt-1">
+                    {feature.description}
+                  </p>
+                </motion.div>
+              )
+            })}
           </div>
         </div>
       </section>

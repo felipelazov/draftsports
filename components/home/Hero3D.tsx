@@ -15,9 +15,13 @@ interface Hero3DProps {
   backgroundImage?: string | null
   cardMedia?: string | null
   cardMediaType?: 'image' | 'video' | null
+  badgeText?: string
+  secondaryCtaText?: string
+  secondaryCtaLink?: string
+  stats?: { value: string; label: string }[]
 }
 
-export function Hero3D({ title, subtitle, ctaText, ctaLink, backgroundImage, cardMedia, cardMediaType }: Hero3DProps = {}) {
+export function Hero3D({ title, subtitle, ctaText, ctaLink, backgroundImage, cardMedia, cardMediaType, badgeText, secondaryCtaText, secondaryCtaLink, stats }: Hero3DProps = {}) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -105,7 +109,7 @@ export function Hero3D({ title, subtitle, ctaText, ctaLink, backgroundImage, car
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-sm text-white/80 mb-6"
             >
               <Sparkles size={16} className="text-[#A29BFE]" />
-              <span>Nova coleção 2026 disponível</span>
+              <span>{badgeText || 'Nova coleção 2026 disponível'}</span>
             </motion.div>
 
             <motion.h1
@@ -151,9 +155,9 @@ export function Hero3D({ title, subtitle, ctaText, ctaLink, backgroundImage, car
                   />
                 </Button>
               </Link>
-              <Link href="/catalogo/retro">
+              <Link href={secondaryCtaLink || '/catalogo/retro'}>
                 <Button variant="outline" size="lg" className="text-base border-white/30 text-white hover:bg-white/10 hover:text-white">
-                  Coleção Retro
+                  {secondaryCtaText || 'Coleção Retro'}
                 </Button>
               </Link>
             </motion.div>
@@ -165,11 +169,11 @@ export function Hero3D({ title, subtitle, ctaText, ctaLink, backgroundImage, car
               transition={{ duration: 0.8, delay: 1 }}
               className="flex gap-8 mt-12 justify-center lg:justify-start"
             >
-              {[
+              {(stats || [
                 { value: '5K+', label: 'Clientes' },
                 { value: '500+', label: 'Produtos' },
                 { value: '4.9', label: 'Avaliação' },
-              ].map((stat) => (
+              ]).map((stat) => (
                 <div key={stat.label} className="text-center">
                   <div className="text-2xl font-bold text-white">
                     {stat.value}

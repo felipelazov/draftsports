@@ -65,6 +65,10 @@ export interface HeroBanner {
   background_image: string | null
   card_media: string | null
   card_media_type: 'image' | 'video' | null
+  badge_text: string
+  secondary_cta_text: string
+  secondary_cta_link: string
+  stats: { value: string; label: string }[]
 }
 
 export interface PromoBanner {
@@ -100,6 +104,91 @@ export interface SiteLinks {
   twitter_url: string
   youtube_url: string
   email: string
+}
+
+export interface StoreInfo {
+  name: string
+  description: string
+  copyright: string
+}
+
+export interface HomepageSections {
+  categories_title: string
+  categories_subtitle: string
+  featured_title: string
+  featured_subtitle: string
+  live_title: string
+  live_subtitle: string
+  new_arrivals_title: string
+  new_arrivals_subtitle: string
+  new_arrivals_cta: string
+}
+
+export interface HomepageFeature {
+  icon: string
+  title: string
+  description: string
+}
+
+export interface HomepageFeatures {
+  items: HomepageFeature[]
+}
+
+export interface NewsletterConfig {
+  title: string
+  subtitle: string
+  button_text: string
+}
+
+export interface ProductBenefit {
+  icon: string
+  title: string
+  subtitle: string
+}
+
+export interface ProductConfig {
+  benefits: ProductBenefit[]
+  installments: number
+  out_of_stock_title: string
+  out_of_stock_message: string
+}
+
+export interface ShippingRegion {
+  name: string
+  cep_start: number
+  cep_end: number
+  price: number
+  days: number
+}
+
+export interface Coupon {
+  code: string
+  type: 'percent' | 'fixed'
+  value: number
+  active: boolean
+}
+
+export interface SecuritySeal {
+  icon: string
+  text: string
+}
+
+export interface CheckoutConfig {
+  pix_discount_percent: number
+  free_shipping_min: number
+  shipping_regions: ShippingRegion[]
+  coupons: Coupon[]
+  security_seals: SecuritySeal[]
+}
+
+export interface FooterColumn {
+  title: string
+  links: { name: string; href: string }[]
+}
+
+export interface FooterConfig {
+  columns: FooterColumn[]
+  payment_methods: string[]
 }
 
 export interface OrderItem {
