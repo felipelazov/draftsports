@@ -237,7 +237,7 @@ export default function ConfiguracoesPage() {
   }
 
   const inputClass =
-    'w-full px-4 py-2.5 bg-[#F8F9FE] rounded-xl border border-gray-200 text-sm text-[#2D3436] outline-none focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/10'
+    'w-full px-4 py-2.5 bg-[var(--gray-100)] rounded-xl border border-[var(--gray-200)] text-sm text-[var(--text)] outline-none focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/10'
 
   if (loading) {
     return (
@@ -250,10 +250,10 @@ export default function ConfiguracoesPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-black text-[#2D3436] mb-6">Configuracoes</h1>
+      <h1 className="text-2xl font-black text-[var(--text)] mb-6">Configuracoes</h1>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6 w-fit">
+      <div className="flex gap-1 bg-[var(--gray-100)] rounded-xl p-1 mb-6 w-fit">
         {[
           { id: 'banners' as Tab, label: 'Banners' },
           { id: 'design' as Tab, label: 'Design System' },
@@ -263,7 +263,7 @@ export default function ConfiguracoesPage() {
             key={t.id}
             onClick={() => { setTab(t.id); setMessage(null) }}
             className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
-              tab === t.id ? 'bg-white text-[#2D3436] shadow-sm' : 'text-[#636E72] hover:text-[#2D3436]'
+              tab === t.id ? 'bg-[var(--card)] text-[var(--text)] shadow-sm' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
             }`}
           >
             {t.label}
@@ -275,8 +275,8 @@ export default function ConfiguracoesPage() {
         <div
           className={`px-4 py-3 rounded-xl mb-6 text-sm ${
             message.type === 'success'
-              ? 'bg-green-50 border border-green-200 text-green-700'
-              : 'bg-red-50 border border-red-200 text-red-700'
+              ? 'bg-green-500/10 border border-green-500/20 text-green-400'
+              : 'bg-red-500/10 border border-red-500/20 text-red-400'
           }`}
         >
           {message.text}
@@ -287,14 +287,14 @@ export default function ConfiguracoesPage() {
       {tab === 'banners' && (
         <div className="space-y-8">
           {/* Hero Banner */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-[#2D3436] mb-4 flex items-center gap-2">
+          <div className="bg-[var(--card)] rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-[var(--text)] mb-4 flex items-center gap-2">
               <ImageIcon size={20} className="text-[#6C5CE7]" />
               Hero Banner
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-[#636E72] mb-1.5">Titulo</label>
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Titulo</label>
                 <input
                   type="text"
                   value={hero.title}
@@ -303,7 +303,7 @@ export default function ConfiguracoesPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#636E72] mb-1.5">Subtitulo</label>
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Subtitulo</label>
                 <textarea
                   value={hero.subtitle}
                   onChange={(e) => setHero({ ...hero, subtitle: e.target.value })}
@@ -313,7 +313,7 @@ export default function ConfiguracoesPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-[#636E72] mb-1.5">Texto do CTA</label>
+                  <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Texto do CTA</label>
                   <input
                     type="text"
                     value={hero.cta_text}
@@ -322,7 +322,7 @@ export default function ConfiguracoesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#636E72] mb-1.5">Link do CTA</label>
+                  <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Link do CTA</label>
                   <input
                     type="text"
                     value={hero.cta_link}
@@ -332,7 +332,7 @@ export default function ConfiguracoesPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#636E72] mb-1.5">
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
                   URL da Imagem de Fundo (opcional)
                 </label>
                 <input
@@ -345,8 +345,8 @@ export default function ConfiguracoesPage() {
               </div>
 
               {/* Card Media */}
-              <div className="border-t border-gray-100 pt-4">
-                <h4 className="text-sm font-semibold text-[#2D3436] mb-3">Midia do Card (foto ou video)</h4>
+              <div className="border-t border-[var(--gray-100)] pt-4">
+                <h4 className="text-sm font-semibold text-[var(--text)] mb-3">Midia do Card (foto ou video)</h4>
                 <div className="space-y-3">
                   <div>
                     <input
@@ -364,7 +364,7 @@ export default function ConfiguracoesPage() {
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploading}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl text-sm text-[#636E72] hover:border-[#6C5CE7] hover:text-[#6C5CE7] transition-colors disabled:opacity-50"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-[var(--gray-300)] rounded-xl text-sm text-[var(--text-secondary)] hover:border-[#6C5CE7] hover:text-[#6C5CE7] transition-colors disabled:opacity-50"
                     >
                       {uploading ? (
                         <>
@@ -381,9 +381,9 @@ export default function ConfiguracoesPage() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="flex-1 h-px bg-gray-200" />
-                    <span className="text-xs text-[#636E72]">ou cole uma URL</span>
-                    <div className="flex-1 h-px bg-gray-200" />
+                    <div className="flex-1 h-px bg-[var(--gray-200)]" />
+                    <span className="text-xs text-[var(--text-secondary)]">ou cole uma URL</span>
+                    <div className="flex-1 h-px bg-[var(--gray-200)]" />
                   </div>
                   <div className="flex gap-2">
                     <select
@@ -393,7 +393,7 @@ export default function ConfiguracoesPage() {
                         card_media_type: (e.target.value as 'image' | 'video') || null,
                         card_media: e.target.value ? hero.card_media : null,
                       })}
-                      className="px-3 py-2.5 bg-[#F8F9FE] rounded-xl border border-gray-200 text-sm text-[#2D3436] outline-none focus:border-[#6C5CE7]"
+                      className="px-3 py-2.5 bg-[var(--gray-100)] rounded-xl border border-[var(--gray-200)] text-sm text-[var(--text)] outline-none focus:border-[#6C5CE7]"
                     >
                       <option value="">Nenhum</option>
                       <option value="image">Imagem</option>
@@ -411,7 +411,7 @@ export default function ConfiguracoesPage() {
                   </div>
 
                   {hero.card_media && (
-                    <div className="relative rounded-xl overflow-hidden border border-gray-200 max-w-[200px]">
+                    <div className="relative rounded-xl overflow-hidden border border-[var(--gray-200)] max-w-[200px]">
                       {hero.card_media_type === 'video' ? (
                         <video src={hero.card_media} autoPlay loop muted playsInline className="w-full h-40 object-cover" />
                       ) : (
@@ -450,14 +450,14 @@ export default function ConfiguracoesPage() {
           </div>
 
           {/* Promo Banner */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-[#2D3436] mb-4 flex items-center gap-2">
+          <div className="bg-[var(--card)] rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-[var(--text)] mb-4 flex items-center gap-2">
               <ImageIcon size={20} className="text-[#FF6B6B]" />
               Promo Banner
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-[#636E72] mb-1.5">Titulo</label>
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Titulo</label>
                 <input
                   type="text"
                   value={promo.title}
@@ -466,7 +466,7 @@ export default function ConfiguracoesPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#636E72] mb-1.5">Subtitulo</label>
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Subtitulo</label>
                 <textarea
                   value={promo.subtitle}
                   onChange={(e) => setPromo({ ...promo, subtitle: e.target.value })}
@@ -475,7 +475,7 @@ export default function ConfiguracoesPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#636E72] mb-1.5">Badge Text</label>
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Badge Text</label>
                 <input
                   type="text"
                   value={promo.badge_text}
@@ -485,7 +485,7 @@ export default function ConfiguracoesPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-[#636E72] mb-1.5">Texto do CTA</label>
+                  <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Texto do CTA</label>
                   <input
                     type="text"
                     value={promo.cta_text}
@@ -494,7 +494,7 @@ export default function ConfiguracoesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#636E72] mb-1.5">Link do CTA</label>
+                  <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Link do CTA</label>
                   <input
                     type="text"
                     value={promo.cta_link}
@@ -504,7 +504,7 @@ export default function ConfiguracoesPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#636E72] mb-1.5">
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
                   URL da Imagem de Fundo (opcional)
                 </label>
                 <input
@@ -552,12 +552,12 @@ export default function ConfiguracoesPage() {
       {tab === 'design' && (
         <div className="space-y-8">
           {colorGroups.map((group) => (
-            <div key={group.label} className="bg-white rounded-2xl p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-[#2D3436] mb-4">{group.label}</h3>
+            <div key={group.label} className="bg-[var(--card)] rounded-2xl p-6 shadow-sm">
+              <h3 className="text-lg font-bold text-[var(--text)] mb-4">{group.label}</h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {group.fields.map((field) => (
                   <div key={field.key}>
-                    <label className="block text-xs font-medium text-[#636E72] mb-1.5">
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
                       {field.label}
                     </label>
                     <div className="flex items-center gap-2">
@@ -565,13 +565,13 @@ export default function ConfiguracoesPage() {
                         type="color"
                         value={theme[field.key as keyof ThemeColors]}
                         onChange={(e) => setTheme({ ...theme, [field.key]: e.target.value })}
-                        className="w-10 h-10 rounded-lg border border-gray-200 cursor-pointer p-0.5"
+                        className="w-10 h-10 rounded-lg border border-[var(--gray-200)] cursor-pointer p-0.5"
                       />
                       <input
                         type="text"
                         value={theme[field.key as keyof ThemeColors]}
                         onChange={(e) => setTheme({ ...theme, [field.key]: e.target.value })}
-                        className="flex-1 px-3 py-2 bg-[#F8F9FE] rounded-lg border border-gray-200 text-xs font-mono outline-none focus:border-[#6C5CE7]"
+                        className="flex-1 px-3 py-2 bg-[var(--gray-100)] rounded-lg border border-[var(--gray-200)] text-xs font-mono outline-none focus:border-[#6C5CE7]"
                       />
                     </div>
                   </div>
@@ -581,8 +581,8 @@ export default function ConfiguracoesPage() {
           ))}
 
           {/* Preview */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-[#2D3436] mb-4">Preview</h3>
+          <div className="bg-[var(--card)] rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-[var(--text)] mb-4">Preview</h3>
             <div className="rounded-xl p-6" style={{ background: theme.bg }}>
               <div className="flex gap-4 mb-4 flex-wrap">
                 <div className="px-4 py-2 rounded-lg text-white text-sm font-semibold" style={{ background: theme.primary }}>
@@ -610,7 +610,7 @@ export default function ConfiguracoesPage() {
             <button
               onClick={resetTheme}
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 bg-gray-100 text-[#636E72] rounded-xl font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-3 bg-[var(--gray-100)] text-[var(--text-secondary)] rounded-xl font-semibold hover:bg-[var(--gray-300)] transition-colors disabled:opacity-50"
             >
               <RotateCcw size={16} />
               Restaurar Padrao
@@ -631,14 +631,14 @@ export default function ConfiguracoesPage() {
       {tab === 'links' && (
         <div className="space-y-8">
           {/* WhatsApp */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-[#2D3436] mb-4 flex items-center gap-2">
+          <div className="bg-[var(--card)] rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-[var(--text)] mb-4 flex items-center gap-2">
               <MessageCircle size={20} className="text-[#25D366]" />
               WhatsApp
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-[#636E72] mb-1.5">
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
                   Numero (com DDI + DDD, sem espacos)
                 </label>
                 <input
@@ -648,10 +648,10 @@ export default function ConfiguracoesPage() {
                   placeholder="5511999999999"
                   className={inputClass}
                 />
-                <p className="text-xs text-[#636E72] mt-1">Ex: 5511999999999 (55 = Brasil, 11 = DDD)</p>
+                <p className="text-xs text-[var(--text-secondary)] mt-1">Ex: 5511999999999 (55 = Brasil, 11 = DDD)</p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#636E72] mb-1.5">
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
                   Mensagem padrao
                 </label>
                 <textarea
@@ -665,14 +665,14 @@ export default function ConfiguracoesPage() {
           </div>
 
           {/* Redes Sociais */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-[#2D3436] mb-4 flex items-center gap-2">
+          <div className="bg-[var(--card)] rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-[var(--text)] mb-4 flex items-center gap-2">
               <Link2 size={20} className="text-[#6C5CE7]" />
               Redes Sociais
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-[#636E72] mb-1.5">Instagram</label>
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Instagram</label>
                 <input
                   type="url"
                   value={links.instagram_url}
@@ -682,7 +682,7 @@ export default function ConfiguracoesPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#636E72] mb-1.5">Twitter / X</label>
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Twitter / X</label>
                 <input
                   type="url"
                   value={links.twitter_url}
@@ -692,7 +692,7 @@ export default function ConfiguracoesPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#636E72] mb-1.5">YouTube</label>
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">YouTube</label>
                 <input
                   type="url"
                   value={links.youtube_url}
@@ -705,10 +705,10 @@ export default function ConfiguracoesPage() {
           </div>
 
           {/* Contato */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-[#2D3436] mb-4">Contato</h3>
+          <div className="bg-[var(--card)] rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-[var(--text)] mb-4">Contato</h3>
             <div>
-              <label className="block text-xs font-medium text-[#636E72] mb-1.5">E-mail de contato</label>
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">E-mail de contato</label>
               <input
                 type="email"
                 value={links.email}

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Package, Shield, ShoppingBag, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, Package, Shield, ShoppingBag, Settings, LogOut, Sun, Moon } from 'lucide-react'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
 
 const navItems = [
@@ -16,7 +16,12 @@ const navItems = [
 
 const masterEmails = (process.env.NEXT_PUBLIC_ADMIN_MASTER_EMAILS || '').split(',').map(e => e.trim().toLowerCase())
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+  isDark: boolean
+  onToggleTheme: () => void
+}
+
+export function AdminSidebar({ isDark, onToggleTheme }: AdminSidebarProps) {
   const pathname = usePathname()
   const [userEmail, setUserEmail] = useState<string | null>(null)
 
@@ -65,7 +70,14 @@ export function AdminSidebar() {
         })}
       </nav>
 
-      <div className="p-4 border-t border-white/10">
+      <div className="p-4 border-t border-white/10 space-y-1">
+        <button
+          onClick={onToggleTheme}
+          className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-colors w-full cursor-pointer"
+        >
+          {isDark ? <Sun size={20} /> : <Moon size={20} />}
+          {isDark ? 'Modo Claro' : 'Modo Escuro'}
+        </button>
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-colors w-full cursor-pointer"

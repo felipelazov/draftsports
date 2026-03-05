@@ -81,10 +81,10 @@ export default function AdminDashboard() {
   }, [])
 
   const statusColors: Record<string, string> = {
-    pendente: 'bg-yellow-100 text-yellow-700',
-    pago: 'bg-blue-100 text-blue-700',
-    enviado: 'bg-purple-100 text-purple-700',
-    entregue: 'bg-green-100 text-green-700',
+    pendente: 'bg-yellow-500/15 text-yellow-400',
+    pago: 'bg-blue-500/15 text-blue-400',
+    enviado: 'bg-purple-500/15 text-purple-400',
+    entregue: 'bg-green-500/15 text-green-400',
   }
 
   const cards = [
@@ -149,7 +149,7 @@ export default function AdminDashboard() {
                   <Link
                     key={order.id}
                     href={`/admin/pedidos/${order.id}`}
-                    className="flex items-center justify-between p-3 rounded-xl hover:bg-[#F8F9FE] transition-colors"
+                    className="flex items-center justify-between p-3 rounded-xl hover:bg-[var(--gray-50)] transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-[#6C5CE7]/10 flex items-center justify-center">
@@ -214,11 +214,11 @@ export default function AdminDashboard() {
                     <Link
                       key={p.id}
                       href={`/admin/produtos/${p.id}`}
-                      className="flex items-center justify-between hover:bg-[#F8F9FE] p-2 rounded-lg transition-colors"
+                      className="flex items-center justify-between hover:bg-[var(--gray-50)] p-2 rounded-lg transition-colors"
                     >
                       <p className="text-sm text-[var(--text)] truncate flex-1">{p.name}</p>
                       <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                        p.stock === 0 ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'
+                        p.stock === 0 ? 'bg-red-500/15 text-red-400' : 'bg-orange-500/15 text-orange-400'
                       }`}>
                         {p.stock === 0 ? 'Esgotado' : `${p.stock} un.`}
                       </span>

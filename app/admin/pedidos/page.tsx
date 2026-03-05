@@ -21,10 +21,10 @@ interface AdminOrder {
 }
 
 const statusConfig = {
-  pendente: { icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-100', label: 'Pendente' },
-  pago: { icon: Check, color: 'text-blue-600', bg: 'bg-blue-100', label: 'Pago' },
-  enviado: { icon: Truck, color: 'text-purple-600', bg: 'bg-purple-100', label: 'Enviado' },
-  entregue: { icon: Package, color: 'text-green-600', bg: 'bg-green-100', label: 'Entregue' },
+  pendente: { icon: Clock, color: 'text-yellow-400', bg: 'bg-yellow-500/15', label: 'Pendente' },
+  pago: { icon: Check, color: 'text-blue-400', bg: 'bg-blue-500/15', label: 'Pago' },
+  enviado: { icon: Truck, color: 'text-purple-400', bg: 'bg-purple-500/15', label: 'Enviado' },
+  entregue: { icon: Package, color: 'text-green-400', bg: 'bg-green-500/15', label: 'Entregue' },
 }
 
 const statusOptions: { value: string; label: string }[] = [
@@ -66,24 +66,24 @@ export default function AdminPedidosPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-black text-[#2D3436] mb-6">Pedidos</h1>
+      <h1 className="text-2xl font-black text-[var(--text)] mb-6">Pedidos</h1>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#636E72]" />
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por ID do pedido..."
-            className="w-full pl-10 pr-4 py-2.5 bg-white rounded-xl border border-gray-200 text-sm outline-none focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/10"
+            className="w-full pl-10 pr-4 py-2.5 bg-[var(--card)] rounded-xl border border-[var(--gray-200)] text-sm outline-none focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/10"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2.5 bg-white rounded-xl border border-gray-200 text-sm outline-none focus:border-[#6C5CE7] min-w-[140px]"
+          className="px-4 py-2.5 bg-[var(--card)] rounded-xl border border-[var(--gray-200)] text-sm outline-none focus:border-[#6C5CE7] min-w-[140px]"
         >
           {statusOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -94,29 +94,29 @@ export default function AdminPedidosPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-[var(--card)] rounded-2xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-100">
-                <th className="text-left px-6 py-4 font-semibold text-[#636E72]">ID</th>
-                <th className="text-left px-6 py-4 font-semibold text-[#636E72]">Itens</th>
-                <th className="text-left px-6 py-4 font-semibold text-[#636E72]">Status</th>
-                <th className="text-left px-6 py-4 font-semibold text-[#636E72]">Total</th>
-                <th className="text-left px-6 py-4 font-semibold text-[#636E72]">Data</th>
-                <th className="text-left px-6 py-4 font-semibold text-[#636E72]">Acoes</th>
+              <tr className="border-b border-[var(--gray-100)]">
+                <th className="text-left px-6 py-4 font-semibold text-[var(--text-secondary)]">ID</th>
+                <th className="text-left px-6 py-4 font-semibold text-[var(--text-secondary)]">Itens</th>
+                <th className="text-left px-6 py-4 font-semibold text-[var(--text-secondary)]">Status</th>
+                <th className="text-left px-6 py-4 font-semibold text-[var(--text-secondary)]">Total</th>
+                <th className="text-left px-6 py-4 font-semibold text-[var(--text-secondary)]">Data</th>
+                <th className="text-left px-6 py-4 font-semibold text-[var(--text-secondary)]">Acoes</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-[#636E72]">
+                  <td colSpan={6} className="px-6 py-12 text-center text-[var(--text-secondary)]">
                     Carregando...
                   </td>
                 </tr>
               ) : filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-[#636E72]">
+                  <td colSpan={6} className="px-6 py-12 text-center text-[var(--text-secondary)]">
                     Nenhum pedido encontrado
                   </td>
                 </tr>
@@ -127,13 +127,13 @@ export default function AdminPedidosPage() {
                   const itemCount = order.order_items.reduce((sum, i) => sum + i.quantity, 0)
 
                   return (
-                    <tr key={order.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                    <tr key={order.id} className="border-b border-[var(--gray-50)] hover:bg-[var(--gray-50)]">
                       <td className="px-6 py-4">
-                        <span className="font-mono font-bold text-[#2D3436]">
+                        <span className="font-mono font-bold text-[var(--text)]">
                           #{order.id.substring(0, 8).toUpperCase()}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-[#636E72]">
+                      <td className="px-6 py-4 text-[var(--text-secondary)]">
                         {itemCount} {itemCount === 1 ? 'item' : 'itens'}
                       </td>
                       <td className="px-6 py-4">
@@ -142,10 +142,10 @@ export default function AdminPedidosPage() {
                           {status.label}
                         </span>
                       </td>
-                      <td className="px-6 py-4 font-bold text-[#2D3436]">
+                      <td className="px-6 py-4 font-bold text-[var(--text)]">
                         {formatPrice(order.total)}
                       </td>
-                      <td className="px-6 py-4 text-[#636E72]">
+                      <td className="px-6 py-4 text-[var(--text-secondary)]">
                         {new Date(order.created_at).toLocaleDateString('pt-BR')}
                       </td>
                       <td className="px-6 py-4">

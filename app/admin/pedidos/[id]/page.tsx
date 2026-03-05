@@ -138,7 +138,7 @@ export default function AdminPedidoDetalhePage() {
   if (!order) {
     return (
       <div className="text-center py-16">
-        <h2 className="text-xl font-bold text-[#2D3436] mb-2">Pedido nao encontrado</h2>
+        <h2 className="text-xl font-bold text-[var(--text)] mb-2">Pedido nao encontrado</h2>
         <Link href="/admin/pedidos" className="text-[#6C5CE7] hover:underline">
           Voltar aos pedidos
         </Link>
@@ -148,13 +148,13 @@ export default function AdminPedidoDetalhePage() {
 
   const addr = order.shipping_address
   const inputClass =
-    'w-full px-4 py-2.5 bg-[#F8F9FE] rounded-xl border border-gray-200 text-sm text-[#2D3436] outline-none focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/10'
+    'w-full px-4 py-2.5 bg-[var(--gray-100)] rounded-xl border border-[var(--gray-200)] text-sm text-[var(--text)] outline-none focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/10'
 
   return (
     <div>
       <Link
         href="/admin/pedidos"
-        className="inline-flex items-center gap-2 text-sm text-[#636E72] hover:text-[#6C5CE7] mb-6"
+        className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[#6C5CE7] mb-6"
       >
         <ArrowLeft size={16} />
         Voltar aos Pedidos
@@ -162,10 +162,10 @@ export default function AdminPedidoDetalhePage() {
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-black text-[#2D3436]">
+          <h1 className="text-2xl font-black text-[var(--text)]">
             Pedido #{order.id.substring(0, 8).toUpperCase()}
           </h1>
-          <p className="text-sm text-[#636E72]">
+          <p className="text-sm text-[var(--text-secondary)]">
             Criado em {new Date(order.created_at).toLocaleDateString('pt-BR', {
               day: '2-digit',
               month: 'long',
@@ -178,7 +178,7 @@ export default function AdminPedidoDetalhePage() {
         <button
           onClick={handleDelete}
           disabled={deleting}
-          className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors text-sm font-medium"
+          className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-500/10 rounded-xl transition-colors text-sm font-medium"
         >
           {deleting ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
           Excluir
@@ -189,8 +189,8 @@ export default function AdminPedidoDetalhePage() {
         <div
           className={`px-4 py-3 rounded-xl mb-6 text-sm ${
             message.type === 'success'
-              ? 'bg-green-50 border border-green-200 text-green-700'
-              : 'bg-red-50 border border-red-200 text-red-700'
+              ? 'bg-green-500/10 border border-green-500/20 text-green-400'
+              : 'bg-red-500/10 border border-red-500/20 text-red-400'
           }`}
         >
           {message.text}
@@ -200,11 +200,11 @@ export default function AdminPedidoDetalhePage() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Edit Form */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-[#2D3436] mb-4">Gerenciar Pedido</h3>
+          <div className="bg-[var(--card)] rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-[var(--text)] mb-4">Gerenciar Pedido</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-[#636E72] mb-1.5">Status</label>
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Status</label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as OrderStatus)}
@@ -216,7 +216,7 @@ export default function AdminPedidoDetalhePage() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#636E72] mb-1.5">
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
                   Codigo de Rastreio
                 </label>
                 <input
@@ -228,7 +228,7 @@ export default function AdminPedidoDetalhePage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#636E72] mb-1.5">
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
                   URL de Rastreio
                 </label>
                 <input
@@ -251,12 +251,12 @@ export default function AdminPedidoDetalhePage() {
           </div>
 
           {/* Items */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-[#2D3436] mb-4">Itens do Pedido</h3>
+          <div className="bg-[var(--card)] rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-[var(--text)] mb-4">Itens do Pedido</h3>
             <div className="space-y-3">
               {order.order_items.map((item) => (
                 <div key={item.id} className="flex items-center gap-4 py-2">
-                  <div className="w-12 h-12 bg-[#F8F9FE] rounded-xl flex-shrink-0 relative overflow-hidden">
+                  <div className="w-12 h-12 bg-[var(--gray-100)] rounded-xl flex-shrink-0 relative overflow-hidden">
                     {item.products?.images?.[0] ? (
                       <Image src={item.products.images[0]} alt={item.products.name} fill className="object-contain p-1" sizes="48px" />
                     ) : (
@@ -266,14 +266,14 @@ export default function AdminPedidoDetalhePage() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-[#2D3436] truncate">
+                    <p className="font-medium text-[var(--text)] truncate">
                       {item.products?.name || 'Produto'}
                     </p>
-                    <p className="text-xs text-[#636E72]">
+                    <p className="text-xs text-[var(--text-secondary)]">
                       Tam: {item.size} | Qtd: {item.quantity}
                     </p>
                   </div>
-                  <p className="font-bold text-[#2D3436]">
+                  <p className="font-bold text-[var(--text)]">
                     {formatPrice(item.price * item.quantity)}
                   </p>
                 </div>
@@ -285,24 +285,24 @@ export default function AdminPedidoDetalhePage() {
         {/* Sidebar Info */}
         <div className="space-y-6">
           {/* Summary */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-[#2D3436] mb-3">Resumo</h3>
+          <div className="bg-[var(--card)] rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-[var(--text)] mb-3">Resumo</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-[#636E72]">Pagamento</span>
-                <span className="font-medium text-[#2D3436]">
+                <span className="text-[var(--text-secondary)]">Pagamento</span>
+                <span className="font-medium text-[var(--text)]">
                   {order.payment_method === 'pix' ? 'PIX' : 'Cartao'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#636E72]">Itens</span>
-                <span className="font-medium text-[#2D3436]">
+                <span className="text-[var(--text-secondary)]">Itens</span>
+                <span className="font-medium text-[var(--text)]">
                   {order.order_items.reduce((s, i) => s + i.quantity, 0)}
                 </span>
               </div>
-              <hr className="border-gray-100" />
+              <hr className="border-[var(--gray-100)]" />
               <div className="flex justify-between pt-1">
-                <span className="font-bold text-[#2D3436]">Total</span>
+                <span className="font-bold text-[var(--text)]">Total</span>
                 <span className="text-xl font-black text-[#6C5CE7]">
                   {formatPrice(order.total)}
                 </span>
@@ -311,13 +311,13 @@ export default function AdminPedidoDetalhePage() {
           </div>
 
           {/* Address */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-[#2D3436] mb-3 flex items-center gap-2">
-              <MapPin size={18} className="text-[#636E72]" />
+          <div className="bg-[var(--card)] rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-[var(--text)] mb-3 flex items-center gap-2">
+              <MapPin size={18} className="text-[var(--text-secondary)]" />
               Endereco
             </h3>
-            <div className="text-sm text-[#636E72] space-y-1">
-              <p className="font-medium text-[#2D3436]">{addr.name}</p>
+            <div className="text-sm text-[var(--text-secondary)] space-y-1">
+              <p className="font-medium text-[var(--text)]">{addr.name}</p>
               <p>{addr.street}, {addr.number}{addr.complement ? ` - ${addr.complement}` : ''}</p>
               <p>{addr.neighborhood}</p>
               <p>{addr.city} - {addr.state}</p>
