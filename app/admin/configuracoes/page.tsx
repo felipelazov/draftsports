@@ -3,13 +3,14 @@
 import { useEffect, useState, useRef } from 'react'
 import {
   Save, Loader2, RotateCcw, Image as ImageIcon, Upload, X, Link2, MessageCircle,
-  Store, Home, Package, ShoppingCart, Palette, Plus, Trash2
+  Store, Home, Package, ShoppingCart, Palette, Plus, Trash2, FileText
 } from 'lucide-react'
 import type {
   HeroBanner, PromoBanner, ThemeColors, SiteLinks, StoreInfo,
   HomepageSections, HomepageFeatures, HomepageFeature, NewsletterConfig,
   ProductConfig, ProductBenefit, CheckoutConfig, ShippingRegion, Coupon, SecuritySeal,
-  FooterConfig, FooterColumn
+  FooterConfig, FooterColumn,
+  InstitutionalPageConfig, FaqPageConfig, FaqCategory, SizeGuideConfig, SizeEntry, ContactPageConfig
 } from '@/types'
 
 const defaultTheme: ThemeColors = {
@@ -100,6 +101,91 @@ const defaultFooterConfig: FooterConfig = {
   payment_methods: ['PIX', 'Visa', 'Master', 'Amex'],
 }
 
+const defaultPageSobre: InstitutionalPageConfig = {
+  title: 'Sobre a DRAFT', intro: 'A DRAFT nasceu da paixão pelo esporte e pela cultura das ligas americanas. Somos a loja referência em camisas esportivas de NBA, NFL, MLB, NHL e Futebol no Brasil.',
+  sections: [
+    { title: 'Nossa Missão', content: 'Trazer para o torcedor brasileiro as melhores camisas esportivas do mundo com qualidade premium, preços acessíveis e entrega rápida para todo o país.' },
+    { title: 'Qualidade Garantida', content: 'Trabalhamos apenas com fornecedores certificados e cada peça passa por rigoroso controle de qualidade. Nossos produtos são confeccionados com tecidos de alta performance, ideais para uso no dia a dia e na prática esportiva.' },
+    { title: 'Compromisso com o Cliente', content: 'Oferecemos atendimento humanizado, política de trocas facilitada e diversas formas de pagamento. Sua satisfação é a nossa prioridade.' },
+  ],
+}
+const defaultPagePrivacidade: InstitutionalPageConfig = {
+  title: 'Política de Privacidade', intro: 'Última atualização: Março de 2026',
+  sections: [
+    { title: '1. Informações que Coletamos', content: 'Coletamos informações que você nos fornece diretamente, como nome, e-mail, endereço de entrega e dados de pagamento ao realizar uma compra.' },
+    { title: '2. Como Usamos suas Informações', content: '- Processar e entregar seus pedidos\n- Enviar confirmações e atualizações de pedido\n- Comunicar promoções e novidades (com seu consentimento)\n- Melhorar nossos produtos e serviços' },
+    { title: '3. Segurança dos Dados', content: 'Utilizamos criptografia SSL e processamento de pagamento via Mercado Pago. Não armazenamos dados de cartão de crédito em nossos servidores.' },
+    { title: '4. Compartilhamento', content: 'Não vendemos suas informações pessoais. Compartilhamos dados apenas com parceiros essenciais para a operação (processamento de pagamento e entrega).' },
+    { title: '5. Seus Direitos', content: 'Conforme a LGPD, você tem direito a acessar, corrigir, excluir seus dados pessoais ou revogar consentimento a qualquer momento entrando em contato conosco.' },
+    { title: '6. Cookies', content: 'Utilizamos cookies para melhorar sua experiência de navegação, manter sua sessão ativa e lembrar suas preferências.' },
+  ],
+}
+const defaultPageTermos: InstitutionalPageConfig = {
+  title: 'Termos de Uso', intro: 'Última atualização: Março de 2026',
+  sections: [
+    { title: '1. Aceitação dos Termos', content: 'Ao acessar e utilizar o site DRAFT, você concorda com estes termos de uso. Caso não concorde, não utilize nossos serviços.' },
+    { title: '2. Produtos e Preços', content: 'Os preços exibidos no site são em Reais (BRL) e podem ser alterados sem aviso prévio. Nos esforçamos para manter as informações atualizadas, mas erros podem ocorrer.' },
+    { title: '3. Pagamento', content: 'Aceitamos pagamento via cartão de crédito, débito e PIX. O processamento é realizado pelo Mercado Pago com total segurança.' },
+    { title: '4. Entrega', content: 'Os prazos de entrega são estimados e podem variar conforme a região. Não nos responsabilizamos por atrasos causados pelos Correios ou transportadoras.' },
+    { title: '5. Propriedade Intelectual', content: 'Todo o conteúdo do site (textos, imagens, logos, design) é propriedade da DRAFT e protegido por leis de direitos autorais.' },
+    { title: '6. Conta do Usuário', content: 'Você é responsável por manter a confidencialidade de suas credenciais de acesso e por todas as atividades realizadas em sua conta.' },
+  ],
+}
+const defaultPageTrocas: InstitutionalPageConfig = {
+  title: 'Trocas e Devoluções', intro: '',
+  sections: [
+    { title: 'Prazo para Troca', content: 'Você tem até 30 dias após o recebimento do produto para solicitar a troca. O produto deve estar em perfeitas condições, sem uso, com etiquetas originais e na embalagem original.' },
+    { title: 'Como Solicitar', content: '1. Acesse Minha Conta → Pedidos\n2. Selecione o pedido que deseja trocar\n3. Entre em contato pelo nosso WhatsApp informando o número do pedido\n4. Envie o produto para o endereço que informaremos\n5. Após recebermos e conferirmos, enviaremos o novo produto' },
+    { title: 'Devolução e Reembolso', content: 'Caso prefira o reembolso, o valor será devolvido na mesma forma de pagamento utilizada na compra em até 10 dias úteis após o recebimento do produto devolvido.' },
+    { title: 'Produtos com Defeito', content: 'Se o produto apresentar defeito de fabricação, entre em contato imediatamente. Neste caso, o frete de devolução é por nossa conta e você pode escolher entre troca ou reembolso integral.' },
+  ],
+  note: { title: 'Importante:', content: 'Produtos personalizados (com nome/número customizado) não são elegíveis para troca, exceto em caso de defeito.' },
+}
+const defaultPageFaq: FaqPageConfig = {
+  title: 'Perguntas Frequentes', subtitle: 'Encontre respostas para as dúvidas mais comuns.',
+  categories: [
+    { category: 'Produtos', questions: [
+      { q: 'As camisas são originais?', a: 'Sim, trabalhamos com fornecedores certificados e todas as peças passam por controle de qualidade rigoroso.' },
+      { q: 'Qual a diferença entre os tipos de camisa?', a: 'A Titular é o modelo principal. A Reserva é o alternativo. A Retro são edições comemorativas.' },
+      { q: 'Os tamanhos seguem padrão brasileiro ou americano?', a: 'Seguem o padrão americano. Consulte nosso Guia de Tamanhos.' },
+    ]},
+    { category: 'Pagamento', questions: [
+      { q: 'Quais formas de pagamento?', a: 'Cartão de crédito, débito e PIX. No PIX você ganha 5% de desconto.' },
+      { q: 'Posso parcelar?', a: 'Sim! Até 12x sem juros no cartão de crédito.' },
+    ]},
+    { category: 'Entrega', questions: [
+      { q: 'Qual o prazo de entrega?', a: 'Entre 5 a 15 dias úteis para capitais e 10 a 20 para demais regiões.' },
+      { q: 'Entregam para todo o Brasil?', a: 'Sim! Todos os estados.' },
+    ]},
+    { category: 'Trocas e Devoluções', questions: [
+      { q: 'Posso trocar se não servir?', a: 'Sim! Até 30 dias após recebimento, sem uso e com etiquetas.' },
+      { q: 'E se chegar com defeito?', a: 'Frete de devolução por nossa conta. Troca ou reembolso integral.' },
+    ]},
+  ],
+}
+const defaultPageTamanhos: SizeGuideConfig = {
+  title: 'Guia de Tamanhos', subtitle: 'Medidas em centímetros (cm). Nossas camisas seguem o padrão americano.',
+  sizes: [
+    { size: 'P', chest: '88-92', length: '68', shoulder: '42' },
+    { size: 'M', chest: '96-100', length: '71', shoulder: '44' },
+    { size: 'G', chest: '104-108', length: '74', shoulder: '47' },
+    { size: 'GG', chest: '112-116', length: '77', shoulder: '50' },
+    { size: 'XGG', chest: '120-124', length: '80', shoulder: '53' },
+  ],
+  instructions: [
+    { label: 'Peito', text: 'Meça a circunferência na parte mais larga do peito, passando por baixo dos braços.' },
+    { label: 'Comprimento', text: 'Meça da base do pescoço até a barra inferior da camisa.' },
+    { label: 'Ombro', text: 'Meça de uma costura do ombro até a outra.' },
+  ],
+  tip: 'Se estiver entre dois tamanhos, recomendamos escolher o maior para um caimento mais confortável.',
+}
+const defaultPageContato: ContactPageConfig = {
+  title: 'Contato', subtitle: 'Estamos aqui para ajudar! Escolha o canal de sua preferência.',
+  whatsapp_number: '5511999999999', whatsapp_text: 'Resposta rápida em horário comercial',
+  email: 'contato@draftsports.com.br', email_response_time: 'Respondemos em até 24 horas',
+  hours: ['Segunda a Sexta: 9h às 18h', 'Sábado: 9h às 13h'],
+}
+
 const colorGroups = [
   { label: 'Cores Brand', fields: [{ key: 'primary', label: 'Primary' }, { key: 'primary_dark', label: 'Primary Dark' }, { key: 'primary_light', label: 'Primary Light' }, { key: 'accent', label: 'Accent' }] },
   { label: 'Status', fields: [{ key: 'success', label: 'Success' }, { key: 'warning', label: 'Warning' }, { key: 'info', label: 'Info' }] },
@@ -113,7 +199,7 @@ const themeVarMap: Record<string, string> = {
   bg_sunken: '--bg-sunken', card: '--card', text: '--text', text_secondary: '--text-secondary', text_muted: '--text-muted',
 }
 
-type Tab = 'loja' | 'homepage' | 'produto' | 'checkout' | 'design' | 'links'
+type Tab = 'loja' | 'homepage' | 'produto' | 'checkout' | 'design' | 'links' | 'paginas'
 
 const TABS: { id: Tab; label: string; icon: typeof Store }[] = [
   { id: 'loja', label: 'Loja', icon: Store },
@@ -122,7 +208,18 @@ const TABS: { id: Tab; label: string; icon: typeof Store }[] = [
   { id: 'checkout', label: 'Checkout', icon: ShoppingCart },
   { id: 'design', label: 'Design System', icon: Palette },
   { id: 'links', label: 'Links & Redes', icon: Link2 },
+  { id: 'paginas', label: 'Paginas', icon: FileText },
 ]
+
+const SUB_PAGES = [
+  { id: 'sobre', label: 'Sobre' },
+  { id: 'privacidade', label: 'Privacidade' },
+  { id: 'termos', label: 'Termos' },
+  { id: 'trocas', label: 'Trocas' },
+  { id: 'faq', label: 'FAQ' },
+  { id: 'tamanhos', label: 'Tamanhos' },
+  { id: 'contato', label: 'Contato' },
+] as const
 
 export default function ConfiguracoesPage() {
   const [tab, setTab] = useState<Tab>('loja')
@@ -141,6 +238,14 @@ export default function ConfiguracoesPage() {
   const [productConfig, setProductConfig] = useState<ProductConfig>(defaultProductConfig)
   const [checkoutConfig, setCheckoutConfig] = useState<CheckoutConfig>(defaultCheckoutConfig)
   const [footerConfig, setFooterConfig] = useState<FooterConfig>(defaultFooterConfig)
+  const [pageSobre, setPageSobre] = useState<InstitutionalPageConfig>(defaultPageSobre)
+  const [pagePrivacidade, setPagePrivacidade] = useState<InstitutionalPageConfig>(defaultPagePrivacidade)
+  const [pageTermos, setPageTermos] = useState<InstitutionalPageConfig>(defaultPageTermos)
+  const [pageTrocas, setPageTrocas] = useState<InstitutionalPageConfig>(defaultPageTrocas)
+  const [pageFaq, setPageFaq] = useState<FaqPageConfig>(defaultPageFaq)
+  const [pageTamanhos, setPageTamanhos] = useState<SizeGuideConfig>(defaultPageTamanhos)
+  const [pageContato, setPageContato] = useState<ContactPageConfig>(defaultPageContato)
+  const [subPage, setSubPage] = useState<string>('sobre')
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -161,6 +266,13 @@ export default function ConfiguracoesPage() {
           if (s.setting_key === 'product_config') setProductConfig({ ...defaultProductConfig, ...s.setting_value })
           if (s.setting_key === 'checkout_config') setCheckoutConfig({ ...defaultCheckoutConfig, ...s.setting_value })
           if (s.setting_key === 'footer_config') setFooterConfig({ ...defaultFooterConfig, ...s.setting_value })
+          if (s.setting_key === 'page_sobre') setPageSobre({ ...defaultPageSobre, ...s.setting_value })
+          if (s.setting_key === 'page_privacidade') setPagePrivacidade({ ...defaultPagePrivacidade, ...s.setting_value })
+          if (s.setting_key === 'page_termos') setPageTermos({ ...defaultPageTermos, ...s.setting_value })
+          if (s.setting_key === 'page_trocas') setPageTrocas({ ...defaultPageTrocas, ...s.setting_value })
+          if (s.setting_key === 'page_faq') setPageFaq({ ...defaultPageFaq, ...s.setting_value })
+          if (s.setting_key === 'page_tamanhos') setPageTamanhos({ ...defaultPageTamanhos, ...s.setting_value })
+          if (s.setting_key === 'page_contato') setPageContato({ ...defaultPageContato, ...s.setting_value })
         }
       })
       .catch(() => {})
@@ -778,6 +890,255 @@ export default function ConfiguracoesPage() {
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
             {saving ? 'Salvando...' : 'Salvar Links & Footer'}
           </button>
+        </div>
+      )}
+
+      {/* ===== TAB: PAGINAS ===== */}
+      {tab === 'paginas' && (
+        <div className="space-y-6">
+          {/* Sub-tabs */}
+          <div className="flex gap-1 bg-[var(--gray-100)] rounded-lg p-1 overflow-x-auto">
+            {SUB_PAGES.map((p) => (
+              <button key={p.id} onClick={() => setSubPage(p.id)}
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all whitespace-nowrap ${subPage === p.id ? 'bg-[var(--card)] text-[var(--text)] shadow-sm' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'}`}>
+                {p.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Sobre / Privacidade / Termos / Trocas — shared institutional editor */}
+          {(['sobre', 'privacidade', 'termos', 'trocas'] as const).includes(subPage as 'sobre') && (() => {
+            const map: Record<string, { state: InstitutionalPageConfig; set: (v: InstitutionalPageConfig) => void; key: string }> = {
+              sobre: { state: pageSobre, set: setPageSobre, key: 'page_sobre' },
+              privacidade: { state: pagePrivacidade, set: setPagePrivacidade, key: 'page_privacidade' },
+              termos: { state: pageTermos, set: setPageTermos, key: 'page_termos' },
+              trocas: { state: pageTrocas, set: setPageTrocas, key: 'page_trocas' },
+            }
+            const { state: pg, set: setPg, key: pgKey } = map[subPage]
+            return (
+              <div className="space-y-6">
+                <div className="bg-[var(--card)] rounded-2xl p-6 shadow-sm space-y-4">
+                  <h3 className="text-lg font-bold text-[var(--text)] mb-2 flex items-center gap-2"><FileText size={20} className="text-[#6C5CE7]" /> {pg.title}</h3>
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Titulo da Pagina</label>
+                    <input type="text" value={pg.title} onChange={(e) => setPg({ ...pg, title: e.target.value })} className={inputClass} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Introducao / Subtitulo</label>
+                    <textarea value={pg.intro} onChange={(e) => setPg({ ...pg, intro: e.target.value })} rows={2} className={inputClass} />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-2">Secoes</label>
+                    <div className="space-y-3">
+                      {pg.sections.map((sec, i) => (
+                        <div key={i} className="border border-[var(--gray-200)] rounded-xl p-4 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <input type="text" value={sec.title} placeholder="Titulo da secao" onChange={(e) => { const s = [...pg.sections]; s[i] = { ...s[i], title: e.target.value }; setPg({ ...pg, sections: s }) }} className={`${smallInputClass} flex-1`} />
+                            <button onClick={() => setPg({ ...pg, sections: pg.sections.filter((_, idx) => idx !== i) })} className="text-red-400 hover:text-red-600"><Trash2 size={14} /></button>
+                          </div>
+                          <textarea value={sec.content} placeholder="Conteudo (use - para listas, 1. para listas numeradas)" onChange={(e) => { const s = [...pg.sections]; s[i] = { ...s[i], content: e.target.value }; setPg({ ...pg, sections: s }) }} rows={3} className={inputClass} />
+                        </div>
+                      ))}
+                      <button onClick={() => setPg({ ...pg, sections: [...pg.sections, { title: '', content: '' }] })} className="text-xs text-[#6C5CE7] font-semibold flex items-center gap-1"><Plus size={12} /> Adicionar secao</button>
+                    </div>
+                  </div>
+
+                  {subPage === 'trocas' && (
+                    <div className="border-t border-[var(--gray-200)] pt-4">
+                      <label className="block text-xs font-medium text-[var(--text-secondary)] mb-2">Nota de Rodape</label>
+                      <div className="flex gap-2 mb-2">
+                        <input type="text" value={pg.note?.title || ''} placeholder="Titulo da nota" onChange={(e) => setPg({ ...pg, note: { title: e.target.value, content: pg.note?.content || '' } })} className={`${smallInputClass} w-40`} />
+                        <input type="text" value={pg.note?.content || ''} placeholder="Conteudo" onChange={(e) => setPg({ ...pg, note: { title: pg.note?.title || '', content: e.target.value } })} className={`${smallInputClass} flex-1`} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <button onClick={() => saveWith([[pgKey, pg]])} disabled={saving}
+                  className="flex items-center gap-2 px-6 py-3 bg-[var(--primary)] text-white rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
+                  {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                  {saving ? 'Salvando...' : 'Salvar Pagina'}
+                </button>
+              </div>
+            )
+          })()}
+
+          {/* FAQ Editor */}
+          {subPage === 'faq' && (
+            <div className="space-y-6">
+              <div className="bg-[var(--card)] rounded-2xl p-6 shadow-sm space-y-4">
+                <h3 className="text-lg font-bold text-[var(--text)] mb-2 flex items-center gap-2"><FileText size={20} className="text-[#6C5CE7]" /> FAQ</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Titulo</label>
+                    <input type="text" value={pageFaq.title} onChange={(e) => setPageFaq({ ...pageFaq, title: e.target.value })} className={inputClass} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Subtitulo</label>
+                    <input type="text" value={pageFaq.subtitle} onChange={(e) => setPageFaq({ ...pageFaq, subtitle: e.target.value })} className={inputClass} />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-[var(--text-secondary)] mb-2">Categorias e Perguntas</label>
+                  <div className="space-y-4">
+                    {pageFaq.categories.map((cat, ci) => (
+                      <div key={ci} className="border border-[var(--gray-200)] rounded-xl p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <input type="text" value={cat.category} placeholder="Nome da categoria" onChange={(e) => { const cats = [...pageFaq.categories]; cats[ci] = { ...cats[ci], category: e.target.value }; setPageFaq({ ...pageFaq, categories: cats }) }} className={`${smallInputClass} flex-1 font-semibold`} />
+                          <button onClick={() => setPageFaq({ ...pageFaq, categories: pageFaq.categories.filter((_, idx) => idx !== ci) })} className="text-red-400 hover:text-red-600"><Trash2 size={14} /></button>
+                        </div>
+                        <div className="space-y-2">
+                          {cat.questions.map((q, qi) => (
+                            <div key={qi} className="bg-[var(--gray-100)] rounded-lg p-3 space-y-1.5">
+                              <div className="flex items-center gap-2">
+                                <input type="text" value={q.q} placeholder="Pergunta" onChange={(e) => { const cats = [...pageFaq.categories]; const qs = [...cats[ci].questions]; qs[qi] = { ...qs[qi], q: e.target.value }; cats[ci] = { ...cats[ci], questions: qs }; setPageFaq({ ...pageFaq, categories: cats }) }} className={`${smallInputClass} flex-1`} />
+                                <button onClick={() => { const cats = [...pageFaq.categories]; cats[ci] = { ...cats[ci], questions: cats[ci].questions.filter((_, idx) => idx !== qi) }; setPageFaq({ ...pageFaq, categories: cats }) }} className="text-red-400 hover:text-red-600"><Trash2 size={12} /></button>
+                              </div>
+                              <textarea value={q.a} placeholder="Resposta" onChange={(e) => { const cats = [...pageFaq.categories]; const qs = [...cats[ci].questions]; qs[qi] = { ...qs[qi], a: e.target.value }; cats[ci] = { ...cats[ci], questions: qs }; setPageFaq({ ...pageFaq, categories: cats }) }} rows={2} className={`${inputClass} text-xs`} />
+                            </div>
+                          ))}
+                          <button onClick={() => { const cats = [...pageFaq.categories]; cats[ci] = { ...cats[ci], questions: [...cats[ci].questions, { q: '', a: '' }] }; setPageFaq({ ...pageFaq, categories: cats }) }} className="text-xs text-[#6C5CE7] font-semibold flex items-center gap-1"><Plus size={10} /> Pergunta</button>
+                        </div>
+                      </div>
+                    ))}
+                    <button onClick={() => setPageFaq({ ...pageFaq, categories: [...pageFaq.categories, { category: '', questions: [] }] })} className="text-xs text-[#6C5CE7] font-semibold flex items-center gap-1"><Plus size={12} /> Adicionar categoria</button>
+                  </div>
+                </div>
+              </div>
+              <button onClick={() => saveWith([['page_faq', pageFaq]])} disabled={saving}
+                className="flex items-center gap-2 px-6 py-3 bg-[var(--primary)] text-white rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
+                {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                {saving ? 'Salvando...' : 'Salvar FAQ'}
+              </button>
+            </div>
+          )}
+
+          {/* Tamanhos Editor */}
+          {subPage === 'tamanhos' && (
+            <div className="space-y-6">
+              <div className="bg-[var(--card)] rounded-2xl p-6 shadow-sm space-y-4">
+                <h3 className="text-lg font-bold text-[var(--text)] mb-2 flex items-center gap-2"><FileText size={20} className="text-[#6C5CE7]" /> Guia de Tamanhos</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Titulo</label>
+                    <input type="text" value={pageTamanhos.title} onChange={(e) => setPageTamanhos({ ...pageTamanhos, title: e.target.value })} className={inputClass} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Subtitulo</label>
+                    <input type="text" value={pageTamanhos.subtitle} onChange={(e) => setPageTamanhos({ ...pageTamanhos, subtitle: e.target.value })} className={inputClass} />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-[var(--text-secondary)] mb-2">Tabela de Tamanhos</label>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead><tr className="bg-[var(--gray-100)]">
+                        <th className="px-3 py-2 text-left text-xs font-medium">Tamanho</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium">Peito</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium">Comprimento</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium">Ombro</th>
+                        <th className="px-3 py-2 w-8"></th>
+                      </tr></thead>
+                      <tbody>
+                        {pageTamanhos.sizes.map((s, i) => (
+                          <tr key={i}>
+                            <td className="px-1 py-1"><input type="text" value={s.size} onChange={(e) => { const sizes = [...pageTamanhos.sizes]; sizes[i] = { ...sizes[i], size: e.target.value }; setPageTamanhos({ ...pageTamanhos, sizes }) }} className={`${smallInputClass} w-full`} /></td>
+                            <td className="px-1 py-1"><input type="text" value={s.chest} onChange={(e) => { const sizes = [...pageTamanhos.sizes]; sizes[i] = { ...sizes[i], chest: e.target.value }; setPageTamanhos({ ...pageTamanhos, sizes }) }} className={`${smallInputClass} w-full`} /></td>
+                            <td className="px-1 py-1"><input type="text" value={s.length} onChange={(e) => { const sizes = [...pageTamanhos.sizes]; sizes[i] = { ...sizes[i], length: e.target.value }; setPageTamanhos({ ...pageTamanhos, sizes }) }} className={`${smallInputClass} w-full`} /></td>
+                            <td className="px-1 py-1"><input type="text" value={s.shoulder} onChange={(e) => { const sizes = [...pageTamanhos.sizes]; sizes[i] = { ...sizes[i], shoulder: e.target.value }; setPageTamanhos({ ...pageTamanhos, sizes }) }} className={`${smallInputClass} w-full`} /></td>
+                            <td className="px-1 py-1"><button onClick={() => setPageTamanhos({ ...pageTamanhos, sizes: pageTamanhos.sizes.filter((_, idx) => idx !== i) })} className="text-red-400 hover:text-red-600"><Trash2 size={12} /></button></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <button onClick={() => setPageTamanhos({ ...pageTamanhos, sizes: [...pageTamanhos.sizes, { size: '', chest: '', length: '', shoulder: '' }] })} className="text-xs text-[#6C5CE7] font-semibold flex items-center gap-1 mt-2"><Plus size={12} /> Adicionar tamanho</button>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-[var(--text-secondary)] mb-2">Como Medir</label>
+                  <div className="space-y-2">
+                    {pageTamanhos.instructions.map((inst, i) => (
+                      <div key={i} className="flex gap-2 items-start">
+                        <input type="text" value={inst.label} placeholder="Medida" onChange={(e) => { const insts = [...pageTamanhos.instructions]; insts[i] = { ...insts[i], label: e.target.value }; setPageTamanhos({ ...pageTamanhos, instructions: insts }) }} className={`${smallInputClass} w-28`} />
+                        <input type="text" value={inst.text} placeholder="Descricao" onChange={(e) => { const insts = [...pageTamanhos.instructions]; insts[i] = { ...insts[i], text: e.target.value }; setPageTamanhos({ ...pageTamanhos, instructions: insts }) }} className={`${smallInputClass} flex-1`} />
+                        <button onClick={() => setPageTamanhos({ ...pageTamanhos, instructions: pageTamanhos.instructions.filter((_, idx) => idx !== i) })} className="text-red-400 hover:text-red-600 mt-2"><Trash2 size={12} /></button>
+                      </div>
+                    ))}
+                    <button onClick={() => setPageTamanhos({ ...pageTamanhos, instructions: [...pageTamanhos.instructions, { label: '', text: '' }] })} className="text-xs text-[#6C5CE7] font-semibold flex items-center gap-1"><Plus size={10} /> Instrucao</button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Dica</label>
+                  <textarea value={pageTamanhos.tip} onChange={(e) => setPageTamanhos({ ...pageTamanhos, tip: e.target.value })} rows={2} className={inputClass} />
+                </div>
+              </div>
+              <button onClick={() => saveWith([['page_tamanhos', pageTamanhos]])} disabled={saving}
+                className="flex items-center gap-2 px-6 py-3 bg-[var(--primary)] text-white rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
+                {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                {saving ? 'Salvando...' : 'Salvar Tamanhos'}
+              </button>
+            </div>
+          )}
+
+          {/* Contato Editor */}
+          {subPage === 'contato' && (
+            <div className="space-y-6">
+              <div className="bg-[var(--card)] rounded-2xl p-6 shadow-sm space-y-4">
+                <h3 className="text-lg font-bold text-[var(--text)] mb-2 flex items-center gap-2"><FileText size={20} className="text-[#6C5CE7]" /> Pagina de Contato</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Titulo</label>
+                    <input type="text" value={pageContato.title} onChange={(e) => setPageContato({ ...pageContato, title: e.target.value })} className={inputClass} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Subtitulo</label>
+                    <input type="text" value={pageContato.subtitle} onChange={(e) => setPageContato({ ...pageContato, subtitle: e.target.value })} className={inputClass} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">WhatsApp (com DDI)</label>
+                    <input type="text" value={pageContato.whatsapp_number} onChange={(e) => setPageContato({ ...pageContato, whatsapp_number: e.target.value.replace(/\D/g, '') })} className={inputClass} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Texto WhatsApp</label>
+                    <input type="text" value={pageContato.whatsapp_text} onChange={(e) => setPageContato({ ...pageContato, whatsapp_text: e.target.value })} className={inputClass} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">E-mail</label>
+                    <input type="email" value={pageContato.email} onChange={(e) => setPageContato({ ...pageContato, email: e.target.value })} className={inputClass} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Tempo de resposta e-mail</label>
+                    <input type="text" value={pageContato.email_response_time} onChange={(e) => setPageContato({ ...pageContato, email_response_time: e.target.value })} className={inputClass} />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[var(--text-secondary)] mb-2">Horarios de Atendimento</label>
+                  <div className="space-y-2">
+                    {pageContato.hours.map((h, i) => (
+                      <div key={i} className="flex gap-2 items-center">
+                        <input type="text" value={h} placeholder="Ex: Segunda a Sexta: 9h às 18h" onChange={(e) => { const hours = [...pageContato.hours]; hours[i] = e.target.value; setPageContato({ ...pageContato, hours }) }} className={`${smallInputClass} flex-1`} />
+                        <button onClick={() => setPageContato({ ...pageContato, hours: pageContato.hours.filter((_, idx) => idx !== i) })} className="text-red-400 hover:text-red-600"><Trash2 size={12} /></button>
+                      </div>
+                    ))}
+                    <button onClick={() => setPageContato({ ...pageContato, hours: [...pageContato.hours, ''] })} className="text-xs text-[#6C5CE7] font-semibold flex items-center gap-1"><Plus size={10} /> Horario</button>
+                  </div>
+                </div>
+              </div>
+              <button onClick={() => saveWith([['page_contato', pageContato]])} disabled={saving}
+                className="flex items-center gap-2 px-6 py-3 bg-[var(--primary)] text-white rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
+                {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                {saving ? 'Salvando...' : 'Salvar Contato'}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -12,6 +12,13 @@ const keyMap: Record<string, string> = {
   product_config: 'product_config',
   checkout_config: 'checkout_config',
   footer_config: 'footer_config',
+  page_sobre: 'page_sobre',
+  page_privacidade: 'page_privacidade',
+  page_termos: 'page_termos',
+  page_trocas: 'page_trocas',
+  page_faq: 'page_faq',
+  page_tamanhos: 'page_tamanhos',
+  page_contato: 'page_contato',
 }
 
 export async function GET() {

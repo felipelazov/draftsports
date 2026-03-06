@@ -191,6 +191,59 @@ export interface FooterConfig {
   payment_methods: string[]
 }
 
+export interface PageSection {
+  title: string
+  content: string
+}
+
+export interface InstitutionalPageConfig {
+  title: string
+  intro: string
+  sections: PageSection[]
+  note?: { title: string; content: string }
+}
+
+export interface FaqQuestion {
+  q: string
+  a: string
+}
+
+export interface FaqCategory {
+  category: string
+  questions: FaqQuestion[]
+}
+
+export interface FaqPageConfig {
+  title: string
+  subtitle: string
+  categories: FaqCategory[]
+}
+
+export interface SizeEntry {
+  size: string
+  chest: string
+  length: string
+  shoulder: string
+}
+
+export interface SizeGuideConfig {
+  title: string
+  subtitle: string
+  sizes: SizeEntry[]
+  instructions: { label: string; text: string }[]
+  tip: string
+}
+
+export interface ContactPageConfig {
+  title: string
+  subtitle: string
+  whatsapp_number: string
+  whatsapp_text: string
+  email: string
+  email_response_time: string
+  hours: string[]
+}
+
 export interface OrderItem {
   id: string
   order_id: string
