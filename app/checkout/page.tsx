@@ -153,7 +153,14 @@ export default function CheckoutPage() {
 
   // Cartao: chamado pelo CardPayment Brick via onSubmit
   const handleCardSubmit = async (formData: Record<string, unknown>) => {
-    const { token, installments, payer } = formData as { token: string; installments: number; payer: { email?: string } }
+    const brickData = formData as {
+      token: string
+      issuer_id: string
+      payment_method_id: string
+      transaction_amount: number
+      installments: number
+      payer: { email?: string; identification?: { type: string; number: string } }
+    }
     setError(null)
     if (!validateForm()) return
 
@@ -175,9 +182,12 @@ export default function CheckoutPage() {
           paymentMethod: 'cartao',
           shippingAddress: getShippingAddress(),
           total: grandTotal,
-          token,
-          installments,
-          payerEmail: payer?.email || personalInfo.email,
+          token: brickData.token,
+          installments: brickData.installments,
+          payment_method_id: brickData.payment_method_id,
+          issuer_id: brickData.issuer_id,
+          payerEmail: brickData.payer?.email || personalInfo.email,
+          payerIdentification: brickData.payer?.identification,
         }),
       })
 

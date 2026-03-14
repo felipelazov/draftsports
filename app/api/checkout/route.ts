@@ -14,7 +14,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { items, paymentMethod, shippingAddress, total, token, installments, payerEmail } = body
+    const {
+      items, paymentMethod, shippingAddress, total,
+      token, installments, payment_method_id, issuer_id,
+      payerEmail, payerIdentification,
+    } = body
 
     if (!items?.length || !paymentMethod || !shippingAddress || !total) {
       return NextResponse.json({ error: 'Dados incompletos' }, { status: 400 })
@@ -30,9 +34,18 @@ export async function POST(request: NextRequest) {
         body: {
           transaction_amount: Number(total),
           token,
+          description: 'Draft Sports - Pedido',
           installments: installments || 1,
+          payment_method_id: payment_method_id || undefined,
+          issuer_id: issuer_id || undefined,
           payer: {
             email: payerEmail || user.email || '',
+            ...(payerIdentification ? {
+              identification: {
+                type: payerIdentification.type || 'CPF',
+                number: payerIdentification.number || '',
+              },
+            } : {}),
           },
         },
       })
@@ -93,6 +106,7 @@ export async function POST(request: NextRequest) {
       const mpPayment = await payment.create({
         body: {
           transaction_amount: Number(total),
+          description: 'Draft Sports - Pedido via PIX',
           payment_method_id: 'pix',
           payer: {
             email: payerEmail || user.email || '',

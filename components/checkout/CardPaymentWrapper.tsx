@@ -1,24 +1,51 @@
 'use client'
 
-import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react'
-
-// Init no nivel do modulo — este arquivo so carrega no client (ssr:false)
-initMercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY!, { locale: 'pt-BR' })
+import { useEffect, useRef, useCallback } from 'react'
+import { loadMercadoPago } from '@mercadopago/sdk-js'
 
 interface CardPaymentWrapperProps {
   amount: number
   onSubmit: (formData: Record<string, unknown>) => Promise<void>
 }
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export default function CardPaymentWrapper({ amount, onSubmit }: CardPaymentWrapperProps) {
-  return (
-    <div style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
-      <CardPayment
-        initialization={{ amount }}
-        onSubmit={async (formData) => {
-          await onSubmit(formData as unknown as Record<string, unknown>)
-        }}
-        customization={{
+  const containerRef = useRef<HTMLDivElement>(null)
+  const brickRef = useRef<any>(null)
+  const initializedRef = useRef(false)
+
+  const onSubmitRef = useRef(onSubmit)
+  onSubmitRef.current = onSubmit
+
+  const initBrick = useCallback(async () => {
+    if (initializedRef.current || !containerRef.current) return
+    initializedRef.current = true
+
+    try {
+      const MercadoPago = await loadMercadoPago() as any
+      if (!MercadoPago) return
+
+      const mp = new MercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY!, {
+        locale: 'pt-BR',
+      })
+
+      const bricksBuilder = mp.bricks()
+
+      brickRef.current = await bricksBuilder.create('cardPayment', 'mp-card-payment-container', {
+        initialization: {
+          amount,
+        },
+        callbacks: {
+          onReady: () => {},
+          onSubmit: async (formData: Record<string, unknown>) => {
+            await onSubmitRef.current(formData)
+          },
+          onError: (error: unknown) => {
+            console.error('CardPayment Brick error:', error)
+          },
+        },
+        customization: {
           visual: {
             style: {
               theme: 'custom',
@@ -53,8 +80,31 @@ export default function CardPaymentWrapper({ amount, onSubmit }: CardPaymentWrap
               },
             },
           },
-        }}
-      />
+        },
+      })
+    } catch (error) {
+      console.error('Failed to init CardPayment Brick:', error)
+      initializedRef.current = false
+    }
+  }, [amount])
+
+  useEffect(() => {
+    initBrick()
+
+    return () => {
+      if (brickRef.current?.unmount) {
+        brickRef.current.unmount()
+      }
+      brickRef.current = null
+      initializedRef.current = false
+    }
+  }, [initBrick])
+
+  return (
+    <div
+      style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}
+    >
+      <div id="mp-card-payment-container" ref={containerRef} />
     </div>
   )
 }

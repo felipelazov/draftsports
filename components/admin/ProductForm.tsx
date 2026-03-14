@@ -124,6 +124,7 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
     if (!files?.length) return
 
     setUploading(true)
+    setError('')
     try {
       const formData = new FormData()
       Array.from(files).forEach(f => formData.append('files', f))
@@ -133,12 +134,20 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
         body: formData,
       })
 
-      if (!res.ok) throw new Error('Upload falhou')
+      const data = await res.json()
 
-      const { urls } = await res.json()
-      setImageUrls(prev => [...prev, ...urls])
-    } catch {
-      setError('Erro ao fazer upload das imagens.')
+      if (!res.ok) {
+        throw new Error(data.error || 'Upload falhou')
+      }
+
+      if (data.urls?.length) {
+        setImageUrls(prev => [...prev, ...data.urls])
+      }
+      if (data.warnings?.length) {
+        setError(`Alguns arquivos falharam: ${data.warnings.join(', ')}`)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao fazer upload das imagens.')
     } finally {
       setUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -519,7 +528,7 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
             ) : (
               <>
                 <Upload size={18} />
-                Clique para adicionar fotos (PNG, JPG, HEIC, WebP)
+                Clique para adicionar fotos (JPG, PNG, HEIC, WebP, AVIF, TIFF, GIF, BMP)
               </>
             )}
           </div>
@@ -527,7 +536,7 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
             ref={fileInputRef}
             type="file"
             multiple
-            accept="image/*,.heic,.heif"
+            accept="image/*,.heic,.heif,.avif,.tiff,.bmp"
             onChange={handleUpload}
             className="hidden"
           />
