@@ -52,74 +52,91 @@ export function ProductCard({ product }: ProductCardProps) {
         }}
       />
 
-      {/* Image */}
-      <div className="relative h-56 sm:h-64 lg:h-72 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
-        {product.images && product.images.length > 0 ? (
-          <Image
-            src={product.images[0]}
-            alt={product.name}
-            fill
-            className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
-            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <JerseyPlaceholder size="xl" league={product.league} />
-          </div>
-        )}
-
-        {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-20">
-          {product.original_price && (
-            <Badge variant="sale">
-              -{calculateDiscount(product.price, product.original_price)}%
-            </Badge>
+      {/* Image — clickable */}
+      <Link href={`/produto/${product.slug}`}>
+        <div className="relative h-56 sm:h-64 lg:h-72 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden cursor-pointer">
+          {product.images && product.images.length > 0 ? (
+            <>
+              {/* Primary image */}
+              <Image
+                src={product.images[0]}
+                alt={product.name}
+                fill
+                className={`object-contain p-4 transition-all duration-500 group-hover:scale-105 ${
+                  product.images.length > 1 ? 'group-hover:opacity-0' : ''
+                }`}
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              />
+              {/* Secondary image — crossfade on hover */}
+              {product.images.length > 1 && (
+                <Image
+                  src={product.images[1]}
+                  alt={`${product.name} - foto 2`}
+                  fill
+                  className="object-contain p-4 transition-all duration-500 opacity-0 group-hover:opacity-100 group-hover:scale-105"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                />
+              )}
+            </>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <JerseyPlaceholder size="xl" league={product.league} />
+            </div>
           )}
-          <Badge variant="default">{product.league}</Badge>
-        </div>
 
-        {/* Favorite */}
-        <button
-          onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            toggleFavorite(product.id)
-          }}
-          aria-label={isFavorite(product.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
-          className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all"
-        >
-          <motion.div
-            whileTap={{ scale: 1.3 }}
-            transition={{ type: 'spring', stiffness: 400 }}
-          >
-            <Heart
-              size={18}
-              className={
-                isFavorite(product.id)
-                  ? 'fill-[#FF6B6B] text-[#FF6B6B]'
-                  : 'text-gray-400 hover:text-[#FF6B6B]'
-              }
-            />
-          </motion.div>
-        </button>
+          {/* Badges */}
+          <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-20">
+            {product.original_price && (
+              <Badge variant="sale">
+                -{calculateDiscount(product.price, product.original_price)}%
+              </Badge>
+            )}
+            <Badge variant="default">{product.league}</Badge>
+          </div>
 
-        {/* Quick add overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
+          {/* Favorite */}
           <button
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
-              addItem(product, product.sizes[0])
-              openCart()
+              toggleFavorite(product.id)
             }}
-            aria-label={`Adicionar ${product.name} ao carrinho`}
-            className="w-full py-2.5 bg-[#6C5CE7] rounded-xl text-sm font-semibold text-white hover:bg-[#5A4BD1] transition-colors flex items-center justify-center gap-2 shadow-lg"
+            aria-label={isFavorite(product.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+            className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all"
           >
-            <ShoppingBag size={16} />
-            Adicionar ao Carrinho
+            <motion.div
+              whileTap={{ scale: 1.3 }}
+              transition={{ type: 'spring', stiffness: 400 }}
+            >
+              <Heart
+                size={18}
+                className={
+                  isFavorite(product.id)
+                    ? 'fill-[#FF6B6B] text-[#FF6B6B]'
+                    : 'text-gray-400 hover:text-[#FF6B6B]'
+                }
+              />
+            </motion.div>
           </button>
+
+          {/* Quick add overlay */}
+          <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
+            <button
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                addItem(product, product.sizes[0])
+                openCart()
+              }}
+              aria-label={`Adicionar ${product.name} ao carrinho`}
+              className="w-full py-2.5 bg-[#6C5CE7] rounded-xl text-sm font-semibold text-white hover:bg-[#5A4BD1] transition-colors flex items-center justify-center gap-2 shadow-lg"
+            >
+              <ShoppingBag size={16} />
+              Adicionar ao Carrinho
+            </button>
+          </div>
         </div>
-      </div>
+      </Link>
 
       {/* Info */}
       <Link href={`/produto/${product.slug}`}>
