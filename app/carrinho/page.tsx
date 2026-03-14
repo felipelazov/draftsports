@@ -187,12 +187,9 @@ export default function CarrinhoPage() {
                 </div>
                 {couponApplied && (
                   <p className="text-xs text-[#00B894] mt-1.5 font-medium">
-                    Cupom DRAFT10 aplicado! -10%
+                    Cupom {couponApplied} aplicado!
                   </p>
                 )}
-                <p className="text-[10px] text-[#636E72] mt-1">
-                  Teste com: DRAFT10
-                </p>
               </div>
 
               {/* Totals */}
