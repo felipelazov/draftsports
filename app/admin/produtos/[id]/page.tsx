@@ -32,7 +32,10 @@ export default function EditarProdutoPage({ params }: { params: Promise<{ id: st
       body: JSON.stringify(data),
     })
 
-    if (!res.ok) throw new Error('Erro ao atualizar produto')
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error(data.error || 'Erro ao atualizar produto')
+    }
     router.push('/admin/produtos')
   }
 

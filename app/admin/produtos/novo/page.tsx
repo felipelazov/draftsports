@@ -16,7 +16,10 @@ export default function NovoProdutoPage() {
       body: JSON.stringify(data),
     })
 
-    if (!res.ok) throw new Error('Erro ao criar produto')
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error(data.error || 'Erro ao criar produto')
+    }
     router.push('/admin/produtos')
   }
 

@@ -26,6 +26,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ product }, { status: 201 })
   } catch (error) {
     console.error('Error creating product:', error)
-    return NextResponse.json({ error: 'Erro ao criar produto' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Erro ao criar produto'
+    const isDuplicate = message.includes('duplicate') || message.includes('unique') || message.includes('23505')
+    return NextResponse.json({
+      error: isDuplicate
+        ? 'Ja existe um produto com este slug. Altere o nome ou os dados para gerar um slug unico.'
+        : message,
+    }, { status: isDuplicate ? 409 : 500 })
   }
 }

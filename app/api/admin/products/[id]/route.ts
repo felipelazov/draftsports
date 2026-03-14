@@ -35,7 +35,13 @@ export async function PUT(
     return NextResponse.json({ product })
   } catch (error) {
     console.error('Error updating product:', error)
-    return NextResponse.json({ error: 'Erro ao atualizar produto' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Erro ao atualizar produto'
+    const isDuplicate = message.includes('duplicate') || message.includes('unique') || message.includes('23505')
+    return NextResponse.json({
+      error: isDuplicate
+        ? 'Ja existe um produto com este slug. Altere o nome ou os dados para gerar um slug unico.'
+        : message,
+    }, { status: isDuplicate ? 409 : 500 })
   }
 }
 

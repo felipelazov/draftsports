@@ -92,13 +92,13 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
       .finally(() => setTeamsLoading(false))
   }, [league])
 
-  // Slug auto-gerado a partir de liga+time+jogador+tipo+numero
+  // Slug auto-gerado a partir de liga+time+nome+jogador+tipo
   useEffect(() => {
-    const parts = [league?.toLowerCase(), team, player, type, playerNumber].filter(Boolean)
+    const parts = [league?.toLowerCase(), team, name, player, type].filter(Boolean)
     if (parts.length >= 2) {
       setSlug(slugify(parts.join(' ')))
     }
-  }, [league, team, player, type, playerNumber])
+  }, [league, team, name, player, type])
 
   const toggleSize = (size: Size) => {
     setSizes(prev => {
