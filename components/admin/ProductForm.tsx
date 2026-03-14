@@ -119,6 +119,62 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
     setStockPerSize(prev => ({ ...prev, [size]: qty }))
   }
 
+  const compressImage = async (file: File): Promise<File> => {
+    // HEIC/HEIF can't be rendered in browser Canvas — send as-is for server-side conversion
+    const name = file.name.toLowerCase()
+    if (name.endsWith('.heic') || name.endsWith('.heif')) {
+      return file
+    }
+
+    // Skip small files (under 2MB)
+    if (file.size < 2 * 1024 * 1024) {
+      return file
+    }
+
+    return new Promise((resolve) => {
+      const img = new window.Image()
+      const url = URL.createObjectURL(file)
+
+      img.onload = () => {
+        URL.revokeObjectURL(url)
+
+        const MAX_DIM = 1600
+        let { width, height } = img
+
+        if (width > MAX_DIM || height > MAX_DIM) {
+          const ratio = Math.min(MAX_DIM / width, MAX_DIM / height)
+          width = Math.round(width * ratio)
+          height = Math.round(height * ratio)
+        }
+
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')!
+        ctx.drawImage(img, 0, 0, width, height)
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob && blob.size < file.size) {
+              resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.webp'), { type: 'image/webp' }))
+            } else {
+              resolve(file) // compression didn't help, send original
+            }
+          },
+          'image/webp',
+          0.85,
+        )
+      }
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url)
+        resolve(file) // can't compress, send original
+      }
+
+      img.src = url
+    })
+  }
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files?.length) return
@@ -127,12 +183,26 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
     setError('')
     try {
       const formData = new FormData()
-      Array.from(files).forEach(f => formData.append('files', f))
+      const fileArray = Array.from(files)
+
+      // Compress images client-side before upload
+      const compressed = await Promise.all(fileArray.map(compressImage))
+      compressed.forEach(f => formData.append('files', f))
 
       const res = await fetch('/api/admin/upload', {
         method: 'POST',
         body: formData,
       })
+
+      // Handle non-JSON responses (e.g., 413 Request Entity Too Large)
+      const contentType = res.headers.get('content-type') || ''
+      if (!contentType.includes('application/json')) {
+        throw new Error(
+          res.status === 413
+            ? 'Arquivo muito grande. Tente imagens menores.'
+            : `Erro no servidor (${res.status})`
+        )
+      }
 
       const data = await res.json()
 

@@ -2,17 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import sharp from 'sharp'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
-
-// Allow up to 25MB per request (multiple images)
 export const maxDuration = 60
 export const dynamic = 'force-dynamic'
 
-const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB per file
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB per file (after client-side compression)
 
 export async function POST(request: NextRequest) {
   try {
