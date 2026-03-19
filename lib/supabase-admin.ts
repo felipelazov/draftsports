@@ -6,12 +6,17 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
-export async function getProducts() {
-  const { data, error } = await supabaseAdmin
+export async function getProducts(includeInactive = false) {
+  let query = supabaseAdmin
     .from('products')
     .select('*')
     .order('created_at', { ascending: false })
 
+  if (!includeInactive) {
+    query = query.eq('active', true)
+  }
+
+  const { data, error } = await query
   if (error) throw error
   return data as Product[]
 }
@@ -43,6 +48,7 @@ export async function getFeaturedProducts() {
     .from('products')
     .select('*')
     .eq('featured', true)
+    .eq('active', true)
     .order('created_at', { ascending: false })
 
   if (error) throw error
@@ -53,6 +59,7 @@ export async function getNewArrivals(limit = 8) {
   const { data, error } = await supabaseAdmin
     .from('products')
     .select('*')
+    .eq('active', true)
     .order('created_at', { ascending: false })
     .limit(limit)
 
@@ -65,6 +72,7 @@ export async function getRelatedProducts(league: string, excludeId: string, limi
     .from('products')
     .select('*')
     .eq('league', league)
+    .eq('active', true)
     .neq('id', excludeId)
     .limit(limit)
 

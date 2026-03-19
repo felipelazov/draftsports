@@ -18,6 +18,7 @@ export default function AdminProdutosPage() {
   const [typeFilter, setTypeFilter] = useState<string>('')
   const [featuredFilter, setFeaturedFilter] = useState<string>('')
   const [stockFilter, setStockFilter] = useState<string>('')
+  const [statusFilter, setStatusFilter] = useState<string>('')
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [sortKey, setSortKey] = useState<string>('')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
@@ -95,7 +96,10 @@ export default function AdminProdutosPage() {
         (stockFilter === 'baixo' && p.stock <= 5) ||
         (stockFilter === 'ok' && p.stock > 5 && p.stock <= 50) ||
         (stockFilter === 'alto' && p.stock > 50)
-      return matchSearch && matchLeague && matchTeam && matchType && matchFeatured && matchStock
+      const matchStatus = statusFilter === '' ||
+        (statusFilter === 'ativo' && p.active !== false) ||
+        (statusFilter === 'inativo' && p.active === false)
+      return matchSearch && matchLeague && matchTeam && matchType && matchFeatured && matchStock && matchStatus
     })
     .sort((a, b) => {
       if (!sortKey) return 0
@@ -111,7 +115,7 @@ export default function AdminProdutosPage() {
       }
     })
 
-  const hasFilters = search || leagueFilter || teamFilter || typeFilter || featuredFilter || stockFilter
+  const hasFilters = search || leagueFilter || teamFilter || typeFilter || featuredFilter || stockFilter || statusFilter
 
   return (
     <div>
@@ -194,11 +198,20 @@ export default function AdminProdutosPage() {
           <option value="ok">Normal (6-50)</option>
           <option value="alto">Alto (50+)</option>
         </select>
+        <select
+          value={statusFilter}
+          onChange={e => setStatusFilter(e.target.value)}
+          className="px-4 py-2.5 bg-[var(--card)] rounded-[var(--radius-md)] border border-[var(--gray-200)] text-sm text-[var(--text)] outline-none focus:border-[var(--primary)] cursor-pointer"
+        >
+          <option value="">Status</option>
+          <option value="ativo">Ativo</option>
+          <option value="inativo">Inativo</option>
+        </select>
         {hasFilters && (
           <button
             onClick={() => {
               setSearch(''); setLeagueFilter(''); setTeamFilter('')
-              setTypeFilter(''); setFeaturedFilter(''); setStockFilter('')
+              setTypeFilter(''); setFeaturedFilter(''); setStockFilter(''); setStatusFilter('')
             }}
             className="px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-[var(--card)] rounded-[var(--radius-md)] border border-[var(--gray-200)] transition-colors cursor-pointer"
           >
@@ -275,6 +288,11 @@ export default function AdminProdutosPage() {
                           </div>
                         )}
                         <span className="font-medium text-[var(--text)]">{product.name}</span>
+                        {product.active === false && (
+                          <span className="px-2 py-0.5 bg-red-100 text-red-600 rounded-full text-[10px] font-semibold uppercase">
+                            Inativo
+                          </span>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4">

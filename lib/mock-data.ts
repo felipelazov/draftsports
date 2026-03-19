@@ -71,6 +71,7 @@ export const mockProducts: Product[] = [
     rating: 4.8,
     review_count: 234,
     video_url: null,
+    active: true,
     created_at: '2026-01-15',
   },
   {
@@ -97,6 +98,7 @@ export const mockProducts: Product[] = [
     rating: 4.7,
     review_count: 189,
     video_url: null,
+    active: true,
     created_at: '2026-01-20',
   },
   {
@@ -123,6 +125,7 @@ export const mockProducts: Product[] = [
     rating: 4.9,
     review_count: 312,
     video_url: null,
+    active: true,
     created_at: '2026-02-01',
   },
   // NFL
@@ -150,6 +153,7 @@ export const mockProducts: Product[] = [
     rating: 4.9,
     review_count: 267,
     video_url: null,
+    active: true,
     created_at: '2026-01-10',
   },
   {
@@ -176,6 +180,7 @@ export const mockProducts: Product[] = [
     rating: 4.6,
     review_count: 145,
     video_url: null,
+    active: true,
     created_at: '2026-01-25',
   },
   {
@@ -202,6 +207,7 @@ export const mockProducts: Product[] = [
     rating: 4.7,
     review_count: 98,
     video_url: null,
+    active: true,
     created_at: '2026-02-10',
   },
   // MLB
@@ -229,6 +235,7 @@ export const mockProducts: Product[] = [
     rating: 4.8,
     review_count: 201,
     video_url: null,
+    active: true,
     created_at: '2026-01-05',
   },
   {
@@ -255,6 +262,7 @@ export const mockProducts: Product[] = [
     rating: 4.9,
     review_count: 356,
     video_url: null,
+    active: true,
     created_at: '2026-02-15',
   },
   // NHL
@@ -282,6 +290,7 @@ export const mockProducts: Product[] = [
     rating: 4.6,
     review_count: 87,
     video_url: null,
+    active: true,
     created_at: '2026-01-30',
   },
   {
@@ -308,6 +317,7 @@ export const mockProducts: Product[] = [
     rating: 4.8,
     review_count: 134,
     video_url: null,
+    active: true,
     created_at: '2026-02-05',
   },
   // Futebol
@@ -335,6 +345,7 @@ export const mockProducts: Product[] = [
     rating: 4.9,
     review_count: 445,
     video_url: null,
+    active: true,
     created_at: '2026-02-20',
   },
   {
@@ -361,6 +372,7 @@ export const mockProducts: Product[] = [
     rating: 4.8,
     review_count: 378,
     video_url: null,
+    active: true,
     created_at: '2026-02-18',
   },
   // Retro
@@ -388,6 +400,7 @@ export const mockProducts: Product[] = [
     rating: 5.0,
     review_count: 523,
     video_url: null,
+    active: true,
     created_at: '2026-01-01',
   },
   {
@@ -414,6 +427,7 @@ export const mockProducts: Product[] = [
     rating: 4.9,
     review_count: 412,
     video_url: null,
+    active: true,
     created_at: '2026-01-08',
   },
   {
@@ -440,6 +454,7 @@ export const mockProducts: Product[] = [
     rating: 4.5,
     review_count: 76,
     video_url: null,
+    active: true,
     created_at: '2026-02-25',
   },
   {
@@ -466,6 +481,7 @@ export const mockProducts: Product[] = [
     rating: 4.7,
     review_count: 132,
     video_url: null,
+    active: true,
     created_at: '2026-02-12',
   },
   {
@@ -492,6 +508,7 @@ export const mockProducts: Product[] = [
     rating: 4.8,
     review_count: 256,
     video_url: null,
+    active: true,
     created_at: '2026-02-08',
   },
   {
@@ -518,6 +535,7 @@ export const mockProducts: Product[] = [
     rating: 4.6,
     review_count: 98,
     video_url: null,
+    active: true,
     created_at: '2026-02-22',
   },
   {
@@ -544,6 +562,7 @@ export const mockProducts: Product[] = [
     rating: 4.7,
     review_count: 167,
     video_url: null,
+    active: true,
     created_at: '2026-01-18',
   },
   {
@@ -570,6 +589,7 @@ export const mockProducts: Product[] = [
     rating: 4.5,
     review_count: 67,
     video_url: null,
+    active: true,
     created_at: '2026-02-28',
   },
   // Additional products
@@ -597,6 +617,7 @@ export const mockProducts: Product[] = [
     rating: 4.7,
     review_count: 143,
     video_url: null,
+    active: true,
     created_at: '2026-02-15',
   },
   {
@@ -623,6 +644,7 @@ export const mockProducts: Product[] = [
     rating: 4.8,
     review_count: 187,
     video_url: null,
+    active: true,
     created_at: '2026-01-28',
   },
   {
@@ -649,6 +671,7 @@ export const mockProducts: Product[] = [
     rating: 4.8,
     review_count: 201,
     video_url: null,
+    active: true,
     created_at: '2026-02-03',
   },
   {
@@ -675,6 +698,7 @@ export const mockProducts: Product[] = [
     rating: 4.6,
     review_count: 89,
     video_url: null,
+    active: true,
     created_at: '2026-02-14',
   },
   {
@@ -701,6 +725,7 @@ export const mockProducts: Product[] = [
     rating: 4.5,
     review_count: 67,
     video_url: null,
+    active: true,
     created_at: '2026-01-22',
   },
   {
@@ -727,6 +752,7 @@ export const mockProducts: Product[] = [
     rating: 4.7,
     review_count: 112,
     video_url: null,
+    active: true,
     created_at: '2026-02-19',
   },
   {
@@ -753,6 +779,7 @@ export const mockProducts: Product[] = [
     rating: 4.5,
     review_count: 78,
     video_url: null,
+    active: true,
     created_at: '2026-01-15',
   },
   {
@@ -779,6 +806,7 @@ export const mockProducts: Product[] = [
     rating: 4.6,
     review_count: 92,
     video_url: null,
+    active: true,
     created_at: '2026-02-06',
   },
   {
@@ -805,6 +833,7 @@ export const mockProducts: Product[] = [
     rating: 4.7,
     review_count: 156,
     video_url: null,
+    active: true,
     created_at: '2026-01-30',
   },
   {
@@ -831,6 +860,7 @@ export const mockProducts: Product[] = [
     rating: 4.8,
     review_count: 98,
     video_url: null,
+    active: true,
     created_at: '2026-02-10',
   },
   {
@@ -857,6 +887,7 @@ export const mockProducts: Product[] = [
     rating: 4.6,
     review_count: 73,
     video_url: null,
+    active: true,
     created_at: '2026-01-25',
   },
   {
@@ -883,6 +914,7 @@ export const mockProducts: Product[] = [
     rating: 4.5,
     review_count: 65,
     video_url: null,
+    active: true,
     created_at: '2026-02-20',
   },
   {
@@ -909,6 +941,7 @@ export const mockProducts: Product[] = [
     rating: 4.8,
     review_count: 289,
     video_url: null,
+    active: true,
     created_at: '2026-02-11',
   },
   {
@@ -935,6 +968,7 @@ export const mockProducts: Product[] = [
     rating: 4.7,
     review_count: 178,
     video_url: null,
+    active: true,
     created_at: '2026-01-20',
   },
   {
@@ -961,6 +995,7 @@ export const mockProducts: Product[] = [
     rating: 4.6,
     review_count: 134,
     video_url: null,
+    active: true,
     created_at: '2026-02-02',
   },
   {
@@ -987,6 +1022,7 @@ export const mockProducts: Product[] = [
     rating: 5.0,
     review_count: 467,
     video_url: null,
+    active: true,
     created_at: '2026-01-05',
   },
   {
@@ -1013,6 +1049,7 @@ export const mockProducts: Product[] = [
     rating: 5.0,
     review_count: 389,
     video_url: null,
+    active: true,
     created_at: '2026-01-12',
   },
   {
@@ -1039,6 +1076,7 @@ export const mockProducts: Product[] = [
     rating: 4.9,
     review_count: 312,
     video_url: null,
+    active: true,
     created_at: '2026-01-08',
   },
   {
@@ -1065,6 +1103,7 @@ export const mockProducts: Product[] = [
     rating: 4.8,
     review_count: 245,
     video_url: null,
+    active: true,
     created_at: '2026-01-15',
   },
   {
@@ -1091,6 +1130,7 @@ export const mockProducts: Product[] = [
     rating: 4.7,
     review_count: 156,
     video_url: null,
+    active: true,
     created_at: '2026-02-26',
   },
   {
@@ -1117,6 +1157,7 @@ export const mockProducts: Product[] = [
     rating: 4.6,
     review_count: 108,
     video_url: null,
+    active: true,
     created_at: '2026-02-17',
   },
   {
@@ -1143,6 +1184,7 @@ export const mockProducts: Product[] = [
     rating: 4.6,
     review_count: 87,
     video_url: null,
+    active: true,
     created_at: '2026-02-09',
   },
   {
@@ -1169,6 +1211,7 @@ export const mockProducts: Product[] = [
     rating: 4.5,
     review_count: 56,
     video_url: null,
+    active: true,
     created_at: '2026-02-24',
   },
   {
@@ -1195,6 +1238,7 @@ export const mockProducts: Product[] = [
     rating: 4.7,
     review_count: 145,
     video_url: null,
+    active: true,
     created_at: '2026-01-28',
   },
   {
@@ -1221,6 +1265,7 @@ export const mockProducts: Product[] = [
     rating: 4.6,
     review_count: 98,
     video_url: null,
+    active: true,
     created_at: '2026-02-13',
   },
   {
@@ -1247,6 +1292,7 @@ export const mockProducts: Product[] = [
     rating: 4.8,
     review_count: 345,
     video_url: null,
+    active: true,
     created_at: '2026-02-01',
   },
   {
@@ -1273,6 +1319,7 @@ export const mockProducts: Product[] = [
     rating: 4.6,
     review_count: 198,
     video_url: null,
+    active: true,
     created_at: '2026-01-18',
   },
   {
@@ -1299,6 +1346,7 @@ export const mockProducts: Product[] = [
     rating: 4.7,
     review_count: 167,
     video_url: null,
+    active: true,
     created_at: '2026-01-22',
   },
   {
@@ -1325,6 +1373,7 @@ export const mockProducts: Product[] = [
     rating: 4.8,
     review_count: 234,
     video_url: null,
+    active: true,
     created_at: '2026-01-10',
   },
   {
@@ -1351,6 +1400,7 @@ export const mockProducts: Product[] = [
     rating: 4.9,
     review_count: 198,
     video_url: null,
+    active: true,
     created_at: '2026-01-03',
   },
 ]

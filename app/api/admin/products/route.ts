@@ -4,7 +4,7 @@ import { getProducts, createProduct } from '@/lib/supabase-admin'
 
 export async function GET() {
   try {
-    const products = await getProducts()
+    const products = await getProducts(true)
     return NextResponse.json({ products })
   } catch (error) {
     console.error('Error fetching products:', error)

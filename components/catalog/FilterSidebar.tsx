@@ -22,7 +22,7 @@ const leagueOptions: { value: League; label: string }[] = [
   { value: 'RETRO', label: 'Retro' },
 ]
 
-const sizeOptions: Size[] = ['P', 'M', 'G', 'GG', 'XGG']
+const sizeOptions: Size[] = ['PP', 'P', 'M', 'G', 'GG', 'XGG', 'GGGG']
 
 const typeOptions: { value: ProductType; label: string }[] = [
   { value: 'titular', label: 'Titular' },

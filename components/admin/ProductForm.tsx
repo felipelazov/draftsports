@@ -14,7 +14,7 @@ interface ProductFormProps {
 
 const allLeagues: League[] = ['NBA', 'NFL', 'MLB', 'NHL', 'FUTEBOL', 'RETRO']
 const allTypes: ProductType[] = ['titular', 'reserva', 'retro', 'especial']
-const allSizes: Size[] = ['P', 'M', 'G', 'GG', 'XGG']
+const allSizes: Size[] = ['PP', 'P', 'M', 'G', 'GG', 'XGG', 'GGGG']
 
 const colorPresets = [
   { name: 'Branco', hex: '#FFFFFF' },
@@ -258,13 +258,14 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
     e.preventDefault()
     setError('')
 
-    if (!name || !price || !team || sizes.length === 0) {
-      setError('Preencha todos os campos obrigatórios.')
+    if (!name || !price || !team) {
+      setError('Preencha todos os campos obrigatórios (nome, preço, time).')
       return
     }
 
     setLoading(true)
     try {
+      const isActive = sizes.length > 0
       await onSubmit({
         name,
         slug: slug || slugify(name),
@@ -284,7 +285,8 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
         stock_per_size: stockPerSize,
         primary_color: primaryColor || null,
         secondary_color: secondaryColor || null,
-        featured,
+        featured: isActive ? featured : false,
+        active: isActive,
         video_url: videoUrl || null,
         rating: parseFloat(rating) || 0,
         review_count: parseInt(reviewCount) || 0,
@@ -468,7 +470,12 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
 
       {/* Sizes + Stock per Size */}
       <div>
-        <label className={labelClass}>Tamanhos e Estoque *</label>
+        <label className={labelClass}>Tamanhos e Estoque</label>
+        {sizes.length === 0 && (
+          <div className="p-3 mb-2 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-700">
+            ⚠️ Nenhum tamanho ativo — o produto será salvo como <strong>inativo</strong> e não aparecerá no site.
+          </div>
+        )}
         <div className="space-y-3 mt-1">
           <div className="flex gap-2">
             {allSizes.map(size => (

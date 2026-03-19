@@ -19,6 +19,7 @@ export interface Product {
   primary_color: string | null
   secondary_color: string | null
   featured: boolean
+  active: boolean
   video_url: string | null
   rating: number
   review_count: number
@@ -29,7 +30,7 @@ export type League = 'NBA' | 'NFL' | 'MLB' | 'NHL' | 'FUTEBOL' | 'RETRO' | 'ACES
 
 export type ProductType = 'titular' | 'reserva' | 'retro' | 'especial'
 
-export type Size = 'P' | 'M' | 'G' | 'GG' | 'XGG'
+export type Size = 'PP' | 'P' | 'M' | 'G' | 'GG' | 'XGG' | 'GGGG'
 
 export type StockPerSize = Partial<Record<Size, number>>
 

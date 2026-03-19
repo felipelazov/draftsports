@@ -11,6 +11,26 @@ interface TeamFormProps {
 
 const leagues = ['NBA', 'NFL', 'MLB', 'NHL', 'FUTEBOL']
 
+const colorPresets = [
+  { name: 'Branco', hex: '#FFFFFF' },
+  { name: 'Preto', hex: '#000000' },
+  { name: 'Azul', hex: '#2563EB' },
+  { name: 'Vermelho', hex: '#DC2626' },
+  { name: 'Amarelo', hex: '#EAB308' },
+  { name: 'Verde', hex: '#16A34A' },
+  { name: 'Roxo', hex: '#7C3AED' },
+  { name: 'Laranja', hex: '#EA580C' },
+  { name: 'Rosa', hex: '#EC4899' },
+  { name: 'Cinza', hex: '#6B7280' },
+  { name: 'Dourado', hex: '#CA8A04' },
+  { name: 'Marrom', hex: '#78350F' },
+  { name: 'Vinho', hex: '#881337' },
+  { name: 'Azul Marinho', hex: '#1E3A5F' },
+  { name: 'Aqua', hex: '#06B6D4' },
+  { name: 'Grená', hex: '#A50034' },
+  { name: 'Azul Claro', hex: '#7DD3FC' },
+]
+
 const inputClass = 'w-full px-4 py-3 bg-[var(--bg)] rounded-xl border border-[var(--gray-200)] text-sm text-[var(--text)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/10'
 const labelClass = 'block text-xs font-medium text-[var(--text-secondary)] mb-1.5'
 
@@ -22,7 +42,7 @@ export function TeamForm({ team, onSubmit }: TeamFormProps) {
   const [abbreviation, setAbbreviation] = useState(team?.abbreviation || '')
   const [league, setLeague] = useState(team?.league || 'NBA')
   const [city, setCity] = useState(team?.city || '')
-  const [primaryColor, setPrimaryColor] = useState(team?.primary_color || '#000000')
+  const [primaryColor, setPrimaryColor] = useState(team?.primary_color || '')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -106,24 +126,32 @@ export function TeamForm({ team, onSubmit }: TeamFormProps) {
             className={inputClass}
           />
         </div>
-        <div>
-          <label className={labelClass}>Cor Primária</label>
-          <div className="flex gap-2">
-            <input
-              type="color"
-              value={primaryColor}
-              onChange={e => setPrimaryColor(e.target.value)}
-              className="w-12 h-[46px] rounded-lg border border-[var(--gray-200)] cursor-pointer"
+      </div>
+
+      {/* Cor Primária - Presets */}
+      <div>
+        <label className={labelClass}>Cor Primária</label>
+        <div className="flex flex-wrap gap-2 mt-1">
+          {colorPresets.map(c => (
+            <button
+              key={c.name}
+              type="button"
+              title={c.name}
+              onClick={() => setPrimaryColor(primaryColor === c.hex ? '' : c.hex)}
+              className={`w-8 h-8 rounded-full border-2 transition-all cursor-pointer ${
+                primaryColor === c.hex
+                  ? 'border-[var(--primary)] scale-110 shadow-md'
+                  : 'border-[var(--gray-200)] hover:scale-105'
+              }`}
+              style={{ backgroundColor: c.hex }}
             />
-            <input
-              type="text"
-              value={primaryColor}
-              onChange={e => setPrimaryColor(e.target.value)}
-              placeholder="#000000"
-              className={inputClass}
-            />
-          </div>
+          ))}
         </div>
+        {primaryColor && (
+          <p className="text-xs text-[var(--text-muted)] mt-1">
+            {colorPresets.find(c => c.hex === primaryColor)?.name || primaryColor}
+          </p>
+        )}
       </div>
 
       <div className="flex gap-3 pt-4">
