@@ -9,16 +9,17 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const tokens = await exchangeCode(code)
-    // Redirect to admin with success message
-    const url = new URL('/admin/configuracoes', request.url)
-    url.searchParams.set('melhorenvio', 'connected')
-    url.searchParams.set('token_preview', tokens.access_token.substring(0, 20) + '...')
-    return NextResponse.redirect(url)
+    await exchangeCode(code)
+    return NextResponse.json({
+      success: true,
+      message: 'Melhor Envio conectado com sucesso! Token salvo no banco de dados.',
+    })
   } catch (error) {
     console.error('Melhor Envio callback error:', error)
-    const url = new URL('/admin/configuracoes', request.url)
-    url.searchParams.set('melhorenvio', 'error')
-    return NextResponse.redirect(url)
+    return NextResponse.json({
+      success: false,
+      error: 'Falha ao conectar Melhor Envio',
+      details: error instanceof Error ? error.message : 'Erro desconhecido',
+    }, { status: 500 })
   }
 }
