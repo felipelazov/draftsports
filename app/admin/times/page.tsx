@@ -150,7 +150,7 @@ export default function AdminTimesPage() {
           onChange={e => setLeagueFilter(e.target.value)}
           className="px-4 py-2.5 bg-[var(--card)] rounded-[var(--radius-md)] border border-[var(--gray-200)] text-sm text-[var(--text)] outline-none focus:border-[var(--primary)] cursor-pointer"
         >
-          <option value="">Todas as ligas</option>
+          <option value="">Todas as categorias</option>
           {leagues.map(l => (
             <option key={l} value={l}>{l}</option>
           ))}
@@ -204,7 +204,7 @@ export default function AdminTimesPage() {
                   </th>
                   <th className="text-left px-6 py-3">
                     <button onClick={() => toggleSort('league')} className="flex items-center gap-1.5 font-semibold text-[var(--text-secondary)] hover:text-[var(--text)] cursor-pointer">
-                      Liga <SortIcon col="league" />
+                      Categoria <SortIcon col="league" />
                     </button>
                   </th>
                   <th className="text-left px-6 py-3">

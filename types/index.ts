@@ -26,7 +26,7 @@ export interface Product {
   created_at: string
 }
 
-export type League = 'NBA' | 'NFL' | 'MLB' | 'NHL' | 'FUTEBOL' | 'RETRO' | 'ACESSORIOS'
+export type League = 'NBA' | 'NFL' | 'MLB' | 'NHL' | 'FUTEBOL' | 'RETRO' | 'JORDAN' | 'ACESSORIOS'
 
 export type ProductType = 'titular' | 'reserva' | 'retro' | 'especial'
 

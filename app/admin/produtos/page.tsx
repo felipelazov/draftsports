@@ -6,7 +6,7 @@ import { Plus, Search, Pencil, Trash2, Star, ArrowUp, ArrowDown, ArrowUpDown, Im
 import { formatPrice } from '@/lib/utils'
 import type { Product, League, ProductType } from '@/types'
 
-const leagues: League[] = ['NBA', 'NFL', 'MLB', 'NHL', 'FUTEBOL', 'RETRO']
+const leagues: League[] = ['NBA', 'NFL', 'MLB', 'NHL', 'FUTEBOL', 'RETRO', 'JORDAN']
 const types: ProductType[] = ['titular', 'reserva', 'retro', 'especial']
 
 export default function AdminProdutosPage() {
@@ -152,7 +152,7 @@ export default function AdminProdutosPage() {
           onChange={e => { setLeagueFilter(e.target.value); setTeamFilter('') }}
           className="px-4 py-2.5 bg-[var(--card)] rounded-[var(--radius-md)] border border-[var(--gray-200)] text-sm text-[var(--text)] outline-none focus:border-[var(--primary)] cursor-pointer"
         >
-          <option value="">Todas as ligas</option>
+          <option value="">Todas as categorias</option>
           {leagues.map(l => (
             <option key={l} value={l}>{l}</option>
           ))}
@@ -244,7 +244,7 @@ export default function AdminProdutosPage() {
                   </th>
                   <th className="text-left px-6 py-4">
                     <button onClick={() => toggleSort('league')} className="flex items-center gap-1.5 font-semibold text-[var(--text-secondary)] hover:text-[var(--text)] cursor-pointer">
-                      Liga <SortIcon col="league" />
+                      Categoria <SortIcon col="league" />
                     </button>
                   </th>
                   <th className="text-left px-6 py-4">

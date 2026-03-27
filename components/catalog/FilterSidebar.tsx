@@ -20,6 +20,7 @@ const leagueOptions: { value: League; label: string }[] = [
   { value: 'NHL', label: 'NHL' },
   { value: 'FUTEBOL', label: 'Futebol' },
   { value: 'RETRO', label: 'Retro' },
+  { value: 'JORDAN', label: 'Jordan' },
 ]
 
 const sizeOptions: Size[] = ['PP', 'P', 'M', 'G', 'GG', 'XGG', 'GGGG']
@@ -66,8 +67,8 @@ function FilterSection({ title, children, defaultOpen = true }: { title: string;
 export function FilterSidebar({ filters, onFilterChange, isOpen, onClose }: FilterSidebarProps) {
   const content = (
     <div className="space-y-0">
-      {/* Liga */}
-      <FilterSection title="Liga">
+      {/* Categoria */}
+      <FilterSection title="Categoria">
         <div className="space-y-1.5">
           {leagueOptions.map((league) => (
             <button

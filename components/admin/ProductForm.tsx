@@ -12,7 +12,7 @@ interface ProductFormProps {
   onSubmit: (data: Omit<Product, 'id' | 'created_at'>) => Promise<void>
 }
 
-const allLeagues: League[] = ['NBA', 'NFL', 'MLB', 'NHL', 'FUTEBOL', 'RETRO']
+const allLeagues: League[] = ['NBA', 'NFL', 'MLB', 'NHL', 'FUTEBOL', 'RETRO', 'JORDAN']
 const allTypes: ProductType[] = ['titular', 'reserva', 'retro', 'especial']
 const allSizes: Size[] = ['PP', 'P', 'M', 'G', 'GG', 'XGG', 'GGGG']
 
@@ -74,7 +74,7 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
 
   useEffect(() => {
     setTeamsLoading(true)
-    const leagueParam = ['NBA', 'NFL', 'MLB', 'NHL', 'FUTEBOL'].includes(league)
+    const leagueParam = ['NBA', 'NFL', 'MLB', 'NHL', 'FUTEBOL', 'JORDAN'].includes(league)
       ? `?league=${league}`
       : ''
     fetch(`/api/admin/teams${leagueParam}`)
@@ -393,7 +393,7 @@ export function ProductForm({ product, onSubmit }: ProductFormProps) {
       {/* League + Type + Team */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className={labelClass}>Liga *</label>
+          <label className={labelClass}>Categoria *</label>
           <select
             value={league}
             onChange={e => setLeague(e.target.value as League)}

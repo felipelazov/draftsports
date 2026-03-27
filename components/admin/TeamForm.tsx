@@ -105,7 +105,7 @@ export function TeamForm({ team, onSubmit }: TeamFormProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className={labelClass}>Liga *</label>
+          <label className={labelClass}>Categoria *</label>
           <select
             value={league}
             onChange={e => setLeague(e.target.value)}

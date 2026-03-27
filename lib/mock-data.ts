@@ -41,7 +41,14 @@ export const leagues: LeagueInfo[] = [
     name: 'Retro',
     icon: '🏆',
     color: '#6C5CE7',
-    description: 'Clássicas vintage de todas as ligas',
+    description: 'Clássicas vintage de todas as categorias',
+  },
+  {
+    id: 'JORDAN',
+    name: 'Jordan',
+    icon: '🏀',
+    color: '#E31937',
+    description: 'Shorts e peças da linha Jordan',
   },
 ]
 
