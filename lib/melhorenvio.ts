@@ -1,4 +1,7 @@
+import { supabaseAdmin } from './supabase-admin'
+
 const BASE_URL = 'https://www.melhorenvio.com.br'
+const SETTING_KEY = 'melhorenvio_tokens'
 
 interface MelhorEnvioTokens {
   access_token: string
@@ -6,8 +9,14 @@ interface MelhorEnvioTokens {
   expires_in: number
 }
 
-// In-memory token store (persists across requests in serverless, refreshed on cold start)
-let cachedToken: { access_token: string; refresh_token: string; expires_at: number } | null = null
+interface StoredToken {
+  access_token: string
+  refresh_token: string
+  expires_at: number
+}
+
+// In-memory cache to avoid DB hits on every request
+let cachedToken: StoredToken | null = null
 
 export function getAuthUrl(): string {
   const params = new URLSearchParams({
@@ -18,6 +27,31 @@ export function getAuthUrl(): string {
     state: 'draftsports',
   })
   return `${BASE_URL}/oauth/authorize?${params.toString()}`
+}
+
+async function saveTokenToDb(token: StoredToken): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from('site_settings')
+    .upsert({
+      setting_key: SETTING_KEY,
+      setting_value: token,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'setting_key' })
+
+  if (error) console.error('Failed to save Melhor Envio token:', error)
+}
+
+async function loadTokenFromDb(): Promise<StoredToken | null> {
+  const { data, error } = await supabaseAdmin
+    .from('site_settings')
+    .select('setting_value')
+    .eq('setting_key', SETTING_KEY)
+    .single()
+
+  if (error || !data) return null
+  const val = data.setting_value as unknown as StoredToken
+  if (!val?.access_token) return null
+  return val
 }
 
 export async function exchangeCode(code: string): Promise<MelhorEnvioTokens> {
@@ -39,17 +73,19 @@ export async function exchangeCode(code: string): Promise<MelhorEnvioTokens> {
   }
 
   const data = await res.json()
-  cachedToken = {
+  const token: StoredToken = {
     access_token: data.access_token,
     refresh_token: data.refresh_token,
     expires_at: Date.now() + data.expires_in * 1000,
   }
+
+  cachedToken = token
+  await saveTokenToDb(token)
+
   return data
 }
 
-async function refreshToken(): Promise<void> {
-  if (!cachedToken?.refresh_token) throw new Error('No refresh token available')
-
+async function refreshToken(current: StoredToken): Promise<StoredToken> {
   const res = await fetch(`${BASE_URL}/oauth/token`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
@@ -57,23 +93,34 @@ async function refreshToken(): Promise<void> {
       grant_type: 'refresh_token',
       client_id: process.env.MELHORENVIO_CLIENT_ID!,
       client_secret: process.env.MELHORENVIO_CLIENT_SECRET!,
-      refresh_token: cachedToken.refresh_token,
+      refresh_token: current.refresh_token,
     }),
   })
 
   if (!res.ok) throw new Error('Failed to refresh Melhor Envio token')
 
   const data = await res.json()
-  cachedToken = {
+  const token: StoredToken = {
     access_token: data.access_token,
     refresh_token: data.refresh_token,
     expires_at: Date.now() + data.expires_in * 1000,
   }
+
+  cachedToken = token
+  await saveTokenToDb(token)
+
+  return token
 }
 
 export async function getAccessToken(): Promise<string | null> {
+  // 1. Check memory cache
   if (!cachedToken) {
-    // Try loading from env (for manual token setup)
+    // 2. Check database
+    cachedToken = await loadTokenFromDb()
+  }
+
+  if (!cachedToken) {
+    // 3. Check env fallback
     if (process.env.MELHORENVIO_ACCESS_TOKEN) {
       return process.env.MELHORENVIO_ACCESS_TOKEN
     }
@@ -82,18 +129,16 @@ export async function getAccessToken(): Promise<string | null> {
 
   // Refresh if expiring in less than 5 minutes
   if (cachedToken.expires_at - Date.now() < 5 * 60 * 1000) {
-    await refreshToken()
+    try {
+      cachedToken = await refreshToken(cachedToken)
+    } catch {
+      // If refresh fails, clear cache and return null
+      cachedToken = null
+      return null
+    }
   }
 
   return cachedToken.access_token
-}
-
-export function setToken(access_token: string, refresh_token: string, expires_in: number) {
-  cachedToken = {
-    access_token,
-    refresh_token,
-    expires_at: Date.now() + expires_in * 1000,
-  }
 }
 
 export interface ShippingQuote {
@@ -114,7 +159,7 @@ export async function calculateShipping(
   products: { width: number; height: number; length: number; weight: number; quantity: number }[]
 ): Promise<ShippingQuote[]> {
   const token = await getAccessToken()
-  if (!token) throw new Error('Melhor Envio nao autorizado. Acesse /admin/melhorenvio para conectar.')
+  if (!token) throw new Error('Melhor Envio nao autorizado. Acesse /api/melhorenvio/auth para conectar.')
 
   const res = await fetch(`${BASE_URL}/api/v2/me/shipment/calculate`, {
     method: 'POST',
@@ -125,7 +170,7 @@ export async function calculateShipping(
       'User-Agent': 'Draft Sports (cffn.shop@gmail.com)',
     },
     body: JSON.stringify({
-      from: { postal_code: process.env.MELHORENVIO_CEP_ORIGEM || '01310100' },
+      from: { postal_code: process.env.MELHORENVIO_CEP_ORIGEM || '15013110' },
       to: { postal_code: cepDestino.replace(/\D/g, '') },
       products: products.map(p => ({
         width: p.width || 20,
@@ -143,6 +188,5 @@ export async function calculateShipping(
   }
 
   const data: ShippingQuote[] = await res.json()
-  // Filter out services with errors
   return data.filter(q => !q.error && parseFloat(q.price) > 0)
 }
