@@ -42,6 +42,8 @@ export default function CheckoutPage() {
   const [couponApplied, setCouponApplied] = useState<string | null>(null)
   const [couponError, setCouponError] = useState<string | null>(null)
   const [shippingCep, setShippingCep] = useState('')
+  const [shippingOptions, setShippingOptions] = useState<{ id: number; name: string; company: string; logo: string | null; price: number; days: number; deliveryRange: { min: number; max: number } }[]>([])
+  const [selectedShipping, setSelectedShipping] = useState<number | null>(null)
   const [shippingCalc, setShippingCalc] = useState<{ value: number; days: number } | null>(null)
   const [shippingLoading, setShippingLoading] = useState(false)
 
@@ -75,15 +77,38 @@ export default function CheckoutPage() {
     const cep = shippingCep.replace(/\D/g, '')
     if (cep.length !== 8) return
     setShippingLoading(true)
-    await new Promise(r => setTimeout(r, 800))
-    const region = parseInt(cep.substring(0, 1))
-    let value = 19.90
-    let days = 7
-    const matched = checkoutConfig.shipping_regions.find(r => region >= r.cep_start && region <= r.cep_end)
-    if (matched) { value = matched.price; days = matched.days }
-    if (subtotal >= checkoutConfig.free_shipping_min) { value = 0 }
-    setShippingCalc({ value, days })
-    setShippingLoading(false)
+    setShippingOptions([])
+    setSelectedShipping(null)
+    setShippingCalc(null)
+    try {
+      const itemCount = items.reduce((sum, i) => sum + i.quantity, 0)
+      const res = await fetch('/api/shipping/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cep, items: Array.from({ length: itemCount }, () => ({ quantity: 1 })) }),
+      })
+      const data = await res.json()
+      if (data.quotes?.length) {
+        const opts = data.quotes.sort((a: { price: number }, b: { price: number }) => a.price - b.price)
+        setShippingOptions(opts)
+        // Auto-select cheapest
+        const cheapest = opts[0]
+        setSelectedShipping(cheapest.id)
+        const price = subtotal >= checkoutConfig.free_shipping_min ? 0 : cheapest.price
+        setShippingCalc({ value: price, days: cheapest.days })
+      }
+    } catch {
+      // Fallback to static calculation
+      const region = parseInt(cep.substring(0, 1))
+      let value = 19.90
+      let days = 7
+      const matched = checkoutConfig.shipping_regions.find(r => region >= r.cep_start && region <= r.cep_end)
+      if (matched) { value = matched.price; days = matched.days }
+      if (subtotal >= checkoutConfig.free_shipping_min) { value = 0 }
+      setShippingCalc({ value, days })
+    } finally {
+      setShippingLoading(false)
+    }
   }
 
   // Polling PIX status
@@ -628,14 +653,53 @@ export default function CheckoutPage() {
                     {shippingLoading ? '...' : 'Calcular'}
                   </button>
                 </div>
-                {shippingCalc && (
+                {shippingLoading && (
+                  <p className="text-xs text-[#636E72] mt-2">Consultando transportadoras...</p>
+                )}
+                {shippingOptions.length > 0 && (
+                  <div className="mt-2 space-y-1.5">
+                    {shippingOptions.map((opt) => {
+                      const isFree = subtotal >= checkoutConfig.free_shipping_min
+                      const displayPrice = isFree ? 0 : opt.price
+                      return (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedShipping(opt.id)
+                            setShippingCalc({ value: displayPrice, days: opt.days })
+                          }}
+                          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-left transition-all ${
+                            selectedShipping === opt.id
+                              ? 'border-[#6C5CE7] bg-[#6C5CE7]/5'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            {opt.logo && (
+                              <img src={opt.logo} alt={opt.company} className="w-6 h-6 object-contain rounded" />
+                            )}
+                            <div>
+                              <p className="text-xs font-semibold text-[#2D3436]">{opt.name}</p>
+                              <p className="text-[10px] text-[#636E72]">{opt.company} — {opt.deliveryRange.min}-{opt.deliveryRange.max} dias uteis</p>
+                            </div>
+                          </div>
+                          <span className={`text-xs font-bold ${isFree ? 'text-[#00B894]' : 'text-[#2D3436]'}`}>
+                            {isFree ? 'Gratis' : formatPrice(opt.price)}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+                {shippingCalc && shippingOptions.length === 0 && (
                   <p className="text-xs text-[#636E72] mt-1">
                     {shippingCalc.value === 0 ? (
-                      <span className="text-[#00B894] font-medium">Frete grátis! </span>
+                      <span className="text-[#00B894] font-medium">Frete gratis! </span>
                     ) : (
                       <span>{formatPrice(shippingCalc.value)} — </span>
                     )}
-                    Entrega em {shippingCalc.days} dias úteis
+                    Entrega em {shippingCalc.days} dias uteis
                   </p>
                 )}
               </div>
