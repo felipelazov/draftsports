@@ -14,15 +14,49 @@ export default function CarrinhoPage() {
   const { items, removeItem, updateQuantity, total } = useCart()
   const [coupon, setCoupon] = useState('')
   const [couponApplied, setCouponApplied] = useState(false)
+  const [shippingCep, setShippingCep] = useState('')
+  const [shippingLoading, setShippingLoading] = useState(false)
+  const [shippingOptions, setShippingOptions] = useState<{ id: number; name: string; company: string; logo: string | null; price: number; days: number; deliveryRange: { min: number; max: number } }[]>([])
+  const [selectedShipping, setSelectedShipping] = useState<number | null>(null)
+  const [shippingValue, setShippingValue] = useState<number | null>(null)
 
   const subtotal = total()
-  const shipping = subtotal >= 299 ? 0 : 29.90
+  const shipping = shippingValue !== null ? shippingValue : (subtotal >= 299 ? 0 : 29.90)
   const discount = couponApplied ? subtotal * 0.1 : 0
   const grandTotal = subtotal - discount + shipping
 
   const handleApplyCoupon = () => {
     if (coupon.toLowerCase() === 'draft10') {
       setCouponApplied(true)
+    }
+  }
+
+  const calcShipping = async () => {
+    const cep = shippingCep.replace(/\D/g, '')
+    if (cep.length !== 8) return
+    setShippingLoading(true)
+    setShippingOptions([])
+    setSelectedShipping(null)
+    setShippingValue(null)
+    try {
+      const itemCount = items.reduce((sum, i) => sum + i.quantity, 0)
+      const res = await fetch('/api/shipping/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cep, items: Array.from({ length: itemCount }, () => ({ quantity: 1 })) }),
+      })
+      const data = await res.json()
+      if (data.quotes?.length) {
+        const opts = data.quotes.sort((a: { price: number }, b: { price: number }) => a.price - b.price)
+        setShippingOptions(opts)
+        const cheapest = opts[0]
+        setSelectedShipping(cheapest.id)
+        setShippingValue(subtotal >= 299 ? 0 : cheapest.price)
+      }
+    } catch {
+      setShippingValue(subtotal >= 299 ? 0 : 29.90)
+    } finally {
+      setShippingLoading(false)
     }
   }
 
@@ -192,6 +226,62 @@ export default function CarrinhoPage() {
                 )}
               </div>
 
+              {/* Calcular Frete */}
+              <div className="mb-4">
+                <p className="text-sm font-semibold text-[#2D3436] mb-2">Calcular frete</p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={shippingCep}
+                    onChange={(e) => setShippingCep(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                    placeholder="Digite seu CEP"
+                    maxLength={8}
+                    className="flex-1 px-3 py-2.5 text-sm bg-[#F8F9FE] rounded-xl border border-gray-200 outline-none focus:border-[#6C5CE7]"
+                  />
+                  <Button variant="outline" size="sm" onClick={calcShipping} disabled={shippingLoading || shippingCep.replace(/\D/g, '').length !== 8}>
+                    {shippingLoading ? '...' : 'Calcular'}
+                  </Button>
+                </div>
+                {shippingLoading && (
+                  <p className="text-xs text-[#636E72] mt-2">Consultando transportadoras...</p>
+                )}
+                {shippingOptions.length > 0 && (
+                  <div className="mt-2 space-y-1.5">
+                    {shippingOptions.map((opt) => {
+                      const isFree = subtotal >= 299
+                      return (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedShipping(opt.id)
+                            setShippingValue(isFree ? 0 : opt.price)
+                          }}
+                          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-left transition-all ${
+                            selectedShipping === opt.id
+                              ? 'border-[#6C5CE7] bg-[#6C5CE7]/5'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            {opt.logo && (
+                              <img src={opt.logo} alt={opt.company} className="w-5 h-5 object-contain rounded" />
+                            )}
+                            <div>
+                              <p className="text-xs font-semibold text-[#2D3436]">{opt.name}</p>
+                              <p className="text-[10px] text-[#636E72]">{opt.deliveryRange.min}-{opt.deliveryRange.max} dias uteis</p>
+                            </div>
+                          </div>
+                          <span className={`text-xs font-bold ${isFree ? 'text-[#00B894]' : 'text-[#2D3436]'}`}>
+                            {isFree ? 'Gratis' : formatPrice(opt.price)}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+
               {/* Totals */}
               <div className="space-y-3 border-t border-gray-100 pt-4">
                 <div className="flex justify-between text-sm">
@@ -207,12 +297,12 @@ export default function CarrinhoPage() {
                 <div className="flex justify-between text-sm">
                   <span className="text-[#636E72]">Frete</span>
                   <span className={shipping === 0 ? 'text-[#00B894] font-medium' : 'text-[#2D3436]'}>
-                    {shipping === 0 ? 'Grátis' : formatPrice(shipping)}
+                    {shippingValue === null && shippingOptions.length === 0 ? 'Informe o CEP' : (shipping === 0 ? 'Gratis' : formatPrice(shipping))}
                   </span>
                 </div>
-                {shipping > 0 && (
+                {shipping > 0 && subtotal < 299 && (
                   <p className="text-[10px] text-[#636E72]">
-                    Frete grátis em compras acima de R$ 299
+                    Frete gratis em compras acima de R$ 299
                   </p>
                 )}
                 <hr className="border-gray-100" />
