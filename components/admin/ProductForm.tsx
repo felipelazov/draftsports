@@ -12,7 +12,7 @@ interface ProductFormProps {
   onSubmit: (data: Omit<Product, 'id' | 'created_at'>) => Promise<void>
 }
 
-const allLeagues: League[] = ['NBA', 'NFL', 'MLB', 'NHL', 'FUTEBOL', 'RETRO', 'JORDAN']
+const allLeagues: League[] = ['NBA', 'NFL', 'MLB', 'NHL', 'FUTEBOL', 'RETRO', 'JORDAN', 'ESPECIAIS']
 const allTypes: ProductType[] = ['titular', 'reserva', 'retro', 'especial']
 const allSizes: Size[] = ['PP', 'P', 'M', 'G', 'GG', 'XGG', 'GGGG']
 

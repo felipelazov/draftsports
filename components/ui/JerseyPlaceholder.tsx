@@ -19,6 +19,7 @@ const leagueColors: Record<string, [string, string]> = {
   FUTEBOL: ['#00B894', '#0984E3'],
   RETRO: ['#6C5CE7', '#A29BFE'],
   JORDAN: ['#E31937', '#000000'],
+  ESPECIAIS: ['#F39C12', '#E74C3C'],
   default: ['#6C5CE7', '#A29BFE'],
 }
 

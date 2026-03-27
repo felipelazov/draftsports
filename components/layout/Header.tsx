@@ -15,6 +15,7 @@ const leagues = [
   { name: 'Futebol', href: '/catalogo/futebol' },
   { name: 'Retro', href: '/catalogo/retro' },
   { name: 'Jordan', href: '/catalogo/jordan' },
+  { name: 'Especiais', href: '/catalogo/especiais' },
 ]
 
 export function Header() {

@@ -50,6 +50,13 @@ export const leagues: LeagueInfo[] = [
     color: '#E31937',
     description: 'Shorts e peças da linha Jordan',
   },
+  {
+    id: 'ESPECIAIS',
+    name: 'Especiais',
+    icon: '✨',
+    color: '#F39C12',
+    description: 'Edições especiais de todos os times',
+  },
 ]
 
 export const mockProducts: Product[] = [

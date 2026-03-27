@@ -6,7 +6,7 @@ import { Plus, Search, Pencil, Trash2, Star, ArrowUp, ArrowDown, ArrowUpDown, Im
 import { formatPrice } from '@/lib/utils'
 import type { Product, League, ProductType } from '@/types'
 
-const leagues: League[] = ['NBA', 'NFL', 'MLB', 'NHL', 'FUTEBOL', 'RETRO', 'JORDAN']
+const leagues: League[] = ['NBA', 'NFL', 'MLB', 'NHL', 'FUTEBOL', 'RETRO', 'JORDAN', 'ESPECIAIS']
 const types: ProductType[] = ['titular', 'reserva', 'retro', 'especial']
 
 export default function AdminProdutosPage() {

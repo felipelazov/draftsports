@@ -21,6 +21,7 @@ const leagueOptions: { value: League; label: string }[] = [
   { value: 'FUTEBOL', label: 'Futebol' },
   { value: 'RETRO', label: 'Retro' },
   { value: 'JORDAN', label: 'Jordan' },
+  { value: 'ESPECIAIS', label: 'Especiais' },
 ]
 
 const sizeOptions: Size[] = ['PP', 'P', 'M', 'G', 'GG', 'XGG', 'GGGG']
